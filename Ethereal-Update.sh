@@ -1,10 +1,10 @@
-﻿#!/bin/bash
+#!/bin/bash
 # ==========================================================
 # EtherealOS OTA Global Updater
 # This script syncs your local OS with the latest Ethereal Core
 # ==========================================================
 
-REPO_URL="https://github.com/abdallah/EtherealOS" # Temporary placeholder
+REPO_URL="https://github.com/abdallah2008xx-jpg/EtherealOS-Core" # The Official Ethereal Core Repo
 
 echo "📡 Contacting Ethereal Update Servers..."
 
