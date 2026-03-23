@@ -10,6 +10,9 @@ echo "🪐 Welcome to EtherealOS Deployment."
 mkdir -p ~/.config/autostart
 mkdir -p ~/.local/bin
 
+# Enable Background Updater 
+cp Ethereal-Notifier-Autostart.desktop ~/.config/autostart/Ethereal-Notifier.desktop 2>/dev/null
+
 # 2. Applying Core System Settings
 echo "🎨 Applying Ethereal Architecture UI..."
 bash apply-theme.sh

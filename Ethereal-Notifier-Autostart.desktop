@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Exec=bash -c "sleep 15 && bash /media/sf_gentoo-files/Ethereal-Notifier.sh"
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Name[en_US]=EtherealOS Updater
+Name=EtherealOS Updater
+Comment[en_US]=OTA Update Notifier
+Comment=OTA Update Notifier
