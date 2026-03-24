@@ -17,7 +17,9 @@ echo ""
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 THEME_DIR="$HOME/.themes/Ethereal/cinnamon"
 mkdir -p "$THEME_DIR"
+mkdir -p "$HOME/.config/gtk-3.0"
 
+# Apply Cinnamon Theme
 if [ -f "$SCRIPT_DIR/cinnamon.css" ]; then
     cp "$SCRIPT_DIR/cinnamon.css" "$THEME_DIR/cinnamon.css"
 else
@@ -26,9 +28,14 @@ fi
 # Write required theme.json
 echo '{"name": "Ethereal Architect"}' > "$THEME_DIR/theme.json"
 
+# Apply GTK Theme
+if [ -f "$SCRIPT_DIR/gtk.css" ]; then
+    cp "$SCRIPT_DIR/gtk.css" "$HOME/.config/gtk-3.0/gtk.css"
+fi
+
 CSS_SRC="$THEME_DIR/cinnamon.css"
 CSS_LINES=$(wc -l < "$CSS_SRC" 2>/dev/null || echo 0)
-echo "[1/9] ✅ CSS Theme ($CSS_LINES lines) installed."
+echo "[1/9] ✅ CSS Theme & GTK CSS installed."
 
 # ── 2. Configure Panels: Top + Left Sidebar + Bottom Dock ──
 # Panel layout: panel1=top (pill bar), panel2=bottom (dock), panel3=left (sidebar)
