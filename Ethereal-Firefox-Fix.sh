@@ -6,30 +6,22 @@
 
 echo "🦊 Starting Advanced Browser Repair Engine..."
 
-# Step 1: Create a secure GUI Password Prompt for root access
-cat << 'PWH' > /tmp/gui-askpass.sh
-#!/bin/bash
-zenity --password --title="EtherealOS Security" --text="Browser System Repair...\n\nPlease enter the root password (123456):"
-PWH
-chmod +x /tmp/gui-askpass.sh
-export SUDO_ASKPASS=/tmp/gui-askpass.sh
+# Step 1: Secure Authority Access
+# Use injected Root Power if available
+[ -n "$ROOT_PW" ] && PW="$ROOT_PW" || PW="123456"
 
 # Step 2: Fix Firefox Profile & Permissions
-if sudo -A true 2>/dev/null; then
-    sudo -A bash -c '
-        echo "🔧 Correcting home directory ownership..."
-        chown -R abdallah:abdallah /home/abdallah 2>/dev/null
-        
-        echo "🦊 Resetting Firefox Profile..."
-        rm -rf /home/abdallah/.mozilla
-        rm -rf /home/abdallah/.cache/mozilla
-    '
+echo "$PW" | sudo -S bash -c '
+    echo "🔧 Correcting home directory ownership..."
+    chown -R abdallah:abdallah /home/abdallah 2>/dev/null
     
-    # Check if Firefox is even installed/working
-    if ! command -v firefox >/dev/null 2>&1; then
-        BROWSER_MISSING=true
-    fi
-else
+    echo "🦊 Resetting Firefox Profile..."
+    rm -rf /home/abdallah/.mozilla
+    rm -rf /home/abdallah/.cache/mozilla
+' 2>/dev/null
+
+# Check if Firefox is even installed/working
+if ! command -v firefox >/dev/null 2>&1; then
     BROWSER_MISSING=true
 fi
 
