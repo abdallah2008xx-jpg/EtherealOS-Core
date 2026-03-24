@@ -404,13 +404,18 @@ stage {
 /* ============================================================
    POPUP MENUS — Right-click, submenus, etc. (Windows 11 Style)
    ============================================================ */
-.popup-menu {
-  background-color: rgba(30, 32, 40, 0.96);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 14px;
-  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.70);
-  padding: 6px;
-  color: #eeeeee;
+.popup-menu,
+.menu,
+#menu,
+.context-menu,
+.popup-menu-boxpointer {
+  background-color: rgba(30, 32, 40, 0.96) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.70) !important;
+  padding: 6px !important;
+  margin: 4px !important;
+  color: #eeeeee !important;
 }
 
 .popup-menu-content {

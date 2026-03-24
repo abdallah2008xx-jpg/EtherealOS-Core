@@ -374,10 +374,10 @@ tooltip.background {
 /* ── Context Menus (Windows 11 Style - GTK Compositor specific) ── */
 /* 1. Fully strip external square window wrappers drawn by Adwaita */
 window.popup,
-window.popup.menu,
-window.popup.context-menu,
 .popup,
-.popup.menu {
+.csd.popup,
+.solid-csd.popup,
+window.popup.menu {
     background-color: transparent !important;
     background: transparent !important;
     background-image: none !important;
@@ -388,7 +388,8 @@ window.popup.context-menu,
 
 /* 2. Style the actual menu block with rounded corners and shadows */
 window.popup menu,
-window.popup .menu,
+.csd.popup menu,
+.solid-csd.popup menu,
 menu,
 .menu,
 .context-menu,
@@ -406,10 +407,14 @@ popover {
 /* 3. Ensure window decorations don't paint a hard square shadow */
 decoration,
 window.popup decoration,
-.popup decoration {
+.popup decoration,
+.csd.popup decoration,
+.solid-csd.popup decoration {
     box-shadow: 0 8px 30px rgba(0,0,0,0.8) !important;
+    background-color: transparent !important;
     border-radius: 14px !important;
     margin: 8px !important;
+    border: none !important;
 }
 
 /* 4. Style menu items with hover states */
