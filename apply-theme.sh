@@ -37,19 +37,19 @@ CSS_SRC="$THEME_DIR/cinnamon.css"
 CSS_LINES=$(wc -l < "$CSS_SRC" 2>/dev/null || echo 0)
 echo "[1/9] ✅ CSS Theme & GTK CSS installed."
 
-# ── 2. Configure Panels: Top + Left Sidebar + Bottom Dock ──
-# Panel layout: panel1=top (pill bar), panel2=bottom (dock), panel3=left (sidebar)
-gsettings set org.cinnamon panels-enabled "['1:0:top', '2:0:bottom', '3:0:left']"
-gsettings set org.cinnamon panels-height "['1:40', '2:52', '3:52']"
+# ── 2. Configure Panels: Bottom Dock + Top Bar + Left Sidebar ──
+# Panel layout: panel1=bottom (primary for "Add to panel"), panel2=top (pill), panel3=left (sidebar)
+gsettings set org.cinnamon panels-enabled "['1:0:bottom', '2:0:top', '3:0:left']"
+gsettings set org.cinnamon panels-height "['1:52', '2:40', '3:52']"
 gsettings set org.cinnamon panels-autohide "['1:intel', '2:intel', '3:intel']"
 
 # Applet layout matching EtherealOS mockup:
-# panel1 (top): menu left, then OS name, systray/clock/status right
-# panel2 (bottom): grouped window list center (dock)
+# panel1 (bottom): grouped window list center (dock)
+# panel2 (top): menu left, then OS name, systray/clock/status right
 # panel3 (left): panel launchers (sidebar icons)
-gsettings set org.cinnamon enabled-applets "['panel1:left:0:menu@cinnamon.org:0', 'panel1:right:0:systray@cinnamon.org:1', 'panel1:right:1:xapp-status@cinnamon.org:2', 'panel1:right:2:keyboard@cinnamon.org:3', 'panel1:right:3:removable-drives@cinnamon.org:4', 'panel1:right:4:network@cinnamon.org:5', 'panel1:right:5:sound@cinnamon.org:6', 'panel1:right:6:power@cinnamon.org:7', 'panel1:right:7:calendar@cinnamon.org:8', 'panel1:right:8:notifications@cinnamon.org:9', 'panel1:right:9:user@cinnamon.org:10', 'panel2:center:0:grouped-window-list@cinnamon.org:11', 'panel3:center:0:panel-launchers@cinnamon.org:12']"
+gsettings set org.cinnamon enabled-applets "['panel2:left:0:menu@cinnamon.org:0', 'panel2:right:0:systray@cinnamon.org:1', 'panel2:right:1:xapp-status@cinnamon.org:2', 'panel2:right:2:keyboard@cinnamon.org:3', 'panel2:right:3:removable-drives@cinnamon.org:4', 'panel2:right:4:network@cinnamon.org:5', 'panel2:right:5:sound@cinnamon.org:6', 'panel2:right:6:power@cinnamon.org:7', 'panel2:right:7:calendar@cinnamon.org:8', 'panel2:right:8:notifications@cinnamon.org:9', 'panel2:right:9:user@cinnamon.org:10', 'panel1:center:0:grouped-window-list@cinnamon.org:11', 'panel3:center:0:panel-launchers@cinnamon.org:12']"
 
-echo "[2/9] ✅ Panels configured (Top bar + Left sidebar + Bottom dock)."
+echo "[2/9] ✅ Panels configured (Bottom primary dock + Top bar + Left sidebar)."
 
 # ── 3. Set Ethereal/Dark Theme & Live Reload ──
 gsettings set org.cinnamon.theme name "Ethereal"
