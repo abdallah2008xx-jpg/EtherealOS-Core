@@ -116,32 +116,30 @@ gsettings set org.cinnamon.desktop.background picture-uri "file://$HOME/.backgro
 # Apply keyboard to US
 dconf write /org/cinnamon/desktop/input-sources/sources "[('xkb','us')]" 2>/dev/null
 
-# ── 10. Install Cinnamon Task Manager Applet (auto right-click integration) ──
-APPLET_ID="ethereal-taskmgr@etherealos.com"
-APPLET_DST="$HOME/.local/share/cinnamon/applets/$APPLET_ID"
-mkdir -p "$APPLET_DST"
+# ── 10. Install Cinnamon Extension (Task Manager in Panel Right-Click) ──
+EXT_ID="ethereal-taskmgr@etherealos.com"
+EXT_DST="$HOME/.local/share/cinnamon/extensions/$EXT_ID"
+mkdir -p "$EXT_DST"
 
-if [ -d "$SCRIPT_DIR/$APPLET_ID" ]; then
-    cp -r "$SCRIPT_DIR/$APPLET_ID/"* "$APPLET_DST/"
-    echo "[10/10] ✅ Cinnamon Applet installed → $APPLET_DST"
-else
-    echo "⚠️ Applet folder not found, skipping."
+if [ -d "$SCRIPT_DIR/$EXT_ID" ]; then
+    cp "$SCRIPT_DIR/$EXT_ID/extension.js" "$EXT_DST/" 2>/dev/null
+    cp "$SCRIPT_DIR/$EXT_ID/metadata.json" "$EXT_DST/" 2>/dev/null
+    echo "[10/10] ✅ Cinnamon Extension installed → $EXT_DST"
 fi
 
-# Wire applet into panel2 (bottom dock) at position right:99 — won't duplicate
-CURRENT_APPLETS=$(gsettings get org.cinnamon enabled-applets 2>/dev/null)
-if ! echo "$CURRENT_APPLETS" | grep -q "$APPLET_ID"; then
-    NEW_ENTRY="'panel2:right:99:${APPLET_ID}:99'"
-    UPDATED=$(echo "$CURRENT_APPLETS" | sed "s/\]$/, ${NEW_ENTRY}]/")
-    gsettings set org.cinnamon enabled-applets "$UPDATED" 2>/dev/null
-    echo "[10/10] ✅ Task Manager applet wired to bottom panel right-click!"
+# Enable the extension (non-destructive, won't duplicate)
+CURRENT_EXTS=$(gsettings get org.cinnamon enabled-extensions 2>/dev/null)
+if ! echo "$CURRENT_EXTS" | grep -q "$EXT_ID"; then
+    if [ "$CURRENT_EXTS" = "@as []" ] || [ -z "$CURRENT_EXTS" ]; then
+        gsettings set org.cinnamon enabled-extensions "['$EXT_ID']" 2>/dev/null
+    else
+        UPDATED=$(echo "$CURRENT_EXTS" | sed "s/\]$/, '$EXT_ID']/")
+        gsettings set org.cinnamon enabled-extensions "$UPDATED" 2>/dev/null
+    fi
+    echo "[10/10] ✅ Task Manager extension enabled in panel right-click!"
 else
-    echo "[10/10] ✅ Task Manager applet already in panel."
+    echo "[10/10] ✅ Task Manager extension already enabled."
 fi
-
-# Hot-reload applets
-dbus-send --session --dest=org.Cinnamon --print-reply /org/Cinnamon org.Cinnamon.Eval \
-  string:'global.reexec_self()' > /dev/null 2>&1 || true
 
 echo "[9/9] ✅ EtherealOS — The Ethereal Architect — ACTIVATED!"
 echo ""

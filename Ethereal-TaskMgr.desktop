@@ -1,9 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=🌌 Ethereal Task Manager
-Comment=Manage processes with 60 FPS live graphs and interactive cards
-Exec=/usr/bin/python3 ~/ethereal-update/Ethereal-TaskMgr.py
-Icon=utilities-system-monitor
-Terminal=false
-Categories=System;Utility;
-Keywords=task;manager;monitor;cpu;ram;process;
