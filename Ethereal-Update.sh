@@ -46,10 +46,8 @@ sleep 1
 
 echo "55"; echo "# 📂 Deploying Desktop Icons..."
 mkdir -p /home/abdallah/Desktop
-# Only copy whitelisted desktop files — never all files!
-for ICON in Update_Ethereal Firefox Ethereal-TaskMgr; do
-    [ -f "$REPO_DIR/${ICON}.desktop" ] && cp "$REPO_DIR/${ICON}.desktop" /home/abdallah/Desktop/
-done
+# Copy all desktop files EXCEPT internal Autostart files
+find "$REPO_DIR" -maxdepth 1 -name "*.desktop" ! -name "*-Autostart.desktop" -exec cp {} /home/abdallah/Desktop/ \;
 chmod +x /home/abdallah/Desktop/*.desktop 2>/dev/null
 
 echo "80"; echo "# 🎨 Applying Theme..."
