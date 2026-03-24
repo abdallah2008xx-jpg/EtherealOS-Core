@@ -318,35 +318,37 @@ stage {
 
 .grouped-window-list-item-box {
   padding: 4px 6px;
-  margin: 4px 4px;
-  spacing: 8px;
-  transition-duration: 250ms;
-  border-radius: 14px;
+  margin: 2px 4px;
+  spacing: 4px;
+  transition-duration: 200ms ease-out;
+  border-radius: 12px;
   border: 1px solid transparent;
 }
 
 .grouped-window-list-item-box:hover {
-  background: linear-gradient(135deg, rgba(126, 215, 255, 0.25), rgba(163, 178, 250, 0.12));
+  background: linear-gradient(135deg, rgba(126, 215, 255, 0.22), rgba(163, 178, 250, 0.12));
   border: 1px solid rgba(126, 215, 255, 0.30);
-  border-radius: 18px;
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.50),
-              0 0 25px rgba(126, 215, 255, 0.25),
+  border-radius: 16px;
+  /* Massive glow gives the illusion of jumping forward without breaking hitbox */
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.60),
+              0 0 25px rgba(126, 215, 255, 0.35),
               inset 0 1px 0 rgba(255, 255, 255, 0.20);
-  /* The Magic "Bounce Up" Effect for Dock */
-  margin-top: -8px;
-  margin-bottom: 16px;
-  padding: 8px 10px;
+  /* Perfect geometry balance: +2px padding, -2px margin (No Flickering!) */
+  padding: 6px 8px;
+  margin: 0px 2px;
 }
 
 .grouped-window-list-item-box:active,
 .grouped-window-list-item-box:focus,
 .grouped-window-list-item-box:checked {
   background: linear-gradient(135deg, rgba(126, 215, 255, 0.25), rgba(163, 178, 250, 0.15));
-  border: 1px solid rgba(126, 215, 255, 0.30);
+  border: 1px solid rgba(126, 215, 255, 0.40);
   border-radius: 16px;
-  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.50),
-              0 0 20px rgba(126, 215, 255, 0.25),
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.50),
+              0 0 20px rgba(126, 215, 255, 0.40),
               inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  padding: 6px 8px;
+  margin: 0px 2px;
 }
 
 .grouped-window-list-item-demands-attention {
