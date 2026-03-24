@@ -8,9 +8,9 @@
 /* ── Safely Targeted Glass Window Backgrounds ── */
 /* Specifically targeting Cinnamon settings and Nemo to avoid painting the desktop black! */
 .cs-main-window,
-.nemo-window,
+.nemo-window:not(.desktop):not(.nemo-desktop),
 window.cs-main-window,
-window.nemo-window {
+window.nemo-window:not(.desktop):not(.nemo-desktop) {
     background-color: rgba(10, 12, 20, 0.92);
     background-image: none;
     color: #e8e8f8;
