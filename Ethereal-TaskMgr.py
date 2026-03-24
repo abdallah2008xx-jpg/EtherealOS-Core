@@ -334,92 +334,101 @@ class TaskManager(Gtk.Window):
             if f.endswith('.desktop'):
                 path = os.path.join(adir, f)
                 name, enabled = f, True
-                with open(path, 'r') as fp:
-                    cont = fp.read()
-                    if 'Hidden=true' in cont or 'X-GNOME-Autostart-enabled=false' in cont: enabled = False
-                    for line in cont.splitlines():
-                        if line.startswith('Name='): name = line[5:]
-                
-                card = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL); card.set_name("startup-card")
-                lbl = Gtk.Label(label=name); lbl.set_name("dash-stat-val"); lbl.set_xalign(0); lbl.set_margin_bottom(5)
-                sub = Gtk.Label(label=f"File: {f}"); sub.set_name("proc-sub"); sub.set_xalign(0)
-                v = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-                v.pack_start(lbl, False, False, 0); v.pack_start(sub, False, False, 0)
-                sw = Gtk.Switch(); sw.set_active(enabled); sw.set_valign(Gtk.Align.CENTER)
-                sw.connect("notify::active", self.on_startup_toggle, path)
-                card.pack_start(v, True, True, 0); card.pack_end(sw, False, False, 10)
-                self.startup_vbox.pack_start(card, False, False, 0)
+                try:
+                    with open(path, 'r', encoding='utf-8', errors='ignore') as fp:
+                        cont = fp.read()
+                        if 'Hidden=true' in cont or 'X-GNOME-Autostart-enabled=false' in cont: enabled = False
+                        for line in cont.splitlines():
+                            if line.startswith('Name='): name = line[5:]
+                    
+                    card = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL); card.set_name("startup-card")
+                    lbl = Gtk.Label(label=name); lbl.set_name("dash-stat-val"); lbl.set_xalign(0); lbl.set_margin_bottom(5)
+                    sub = Gtk.Label(label=f"File: {f}"); sub.set_name("proc-sub"); sub.set_xalign(0)
+                    v = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+                    v.pack_start(lbl, False, False, 0); v.pack_start(sub, False, False, 0)
+                    sw = Gtk.Switch(); sw.set_active(enabled); sw.set_valign(Gtk.Align.CENTER)
+                    sw.connect("notify::active", self.on_startup_toggle, path)
+                    card.pack_start(v, True, True, 0); card.pack_end(sw, False, False, 10)
+                    self.startup_vbox.pack_start(card, False, False, 0)
+                except Exception as e:
+                    pass
         self.startup_vbox.show_all()
 
     def on_startup_toggle(self, switch, gparam, filepath):
         try:
-            with open(filepath, 'r') as f: lines = f.readlines()
+            with open(filepath, 'r', encoding='utf-8', errors='ignore') as f: lines = f.readlines()
             out = [l for l in lines if not l.startswith('Hidden=') and not l.startswith('X-GNOME-Autostart-enabled=')]
             if not switch.get_active(): out.extend(["Hidden=true\n", "X-GNOME-Autostart-enabled=false\n"])
-            with open(filepath, 'w') as f: f.writelines(out)
+            with open(filepath, 'w', encoding='utf-8') as f: f.writelines(out)
         except Exception as e: print(e)
 
     # --- UPDATER ---
     def update_data(self):
-        procs, cpu_pct, mem_tot, mem_used = self.tracker.update()
-        cur_page = self.stack.get_visible_child_name()
-        
-        # CPU
-        if cur_page in ["cpu", "processes"]:  # always update graph if visible
+        try:
+            procs, cpu_pct, mem_tot, mem_used = self.tracker.update()
+            cur_page = self.stack.get_visible_child_name()
+            
+            # Always update graphs so they don't break
             self.gr_cpu.add_point(cpu_pct)
-        if cur_page == "cpu":
-            self.st_cpu_util.set_text(f"{cpu_pct:.1f} %")
-            t = int(time.clock_gettime(time.CLOCK_BOOTTIME))
-            self.st_cpu_up.set_text(f"{t//3600}:{(t%3600)//60:02d}:{t%60:02d}")
-            
-        # RAM
-        mem_pct = (mem_used / mem_tot) * 100.0 if mem_tot > 0 else 0
-        if cur_page in ["ram", "processes"]:
+            mem_pct = (mem_used / mem_tot) * 100.0 if mem_tot > 0 else 0
             self.gr_ram.add_point(mem_pct)
-        if cur_page == "ram":
-            self.st_ram_use.set_text(f"{(mem_used/1024/1024):.1f} GB ({mem_pct:.0f}%)")
-            self.st_ram_tot.set_text(f"{(mem_tot/1024/1024):.1f} GB Installed")
-            
-        # Disk
-        disk_used, disk_tot = self.tracker.get_disk_usage()
-        disk_pct = (disk_used / disk_tot) * 100.0 if disk_tot > 0 else 0
-        if cur_page in ["disk", "processes"]:
+            disk_used, disk_tot = self.tracker.get_disk_usage()
+            disk_pct = (disk_used / disk_tot) * 100.0 if disk_tot > 0 else 0
             self.gr_disk.add_point(disk_pct)
-        if cur_page == "disk":
-            self.st_disk_used.set_text(f"{(disk_used/1024/1024/1024):.1f} GB ({disk_pct:.0f}%)")
-            self.st_disk_tot.set_text(f"{(disk_tot/1024/1024/1024):.1f} GB Capacity")
-            
-        # GPU
-        if cur_page in ["gpu", "processes"]:
             self.gr_gpu.add_point(20) # Auto wave
-        if cur_page == "gpu":
-            self.st_gpu_name.set_text(self.tracker.gpu_name)
-            self.st_gpu_status.set_text("Active & Running")
             
-        # Processes Grid
-        if cur_page == "processes":
-            for row in self.proc_list.get_children(): self.proc_list.remove(row)
-            for p in procs[:40]:
-                row = Gtk.ListBoxRow(); row.override_background_color(Gtk.StateFlags.NORMAL, Gdk.RGBA(0,0,0,0))
-                box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL); box.set_name("process-card")
+            # CPU
+            if cur_page == "cpu":
+                self.st_cpu_util.set_text(f"{cpu_pct:.1f} %")
+                try:
+                    with open('/proc/uptime', 'r') as f: 
+                        t = int(float(f.readline().split()[0]))
+                        self.st_cpu_up.set_text(f"{t//3600}:{(t%3600)//60:02d}:{t%60:02d}")
+                except:
+                    t = int(time.clock_gettime(time.CLOCK_BOOTTIME))
+                    self.st_cpu_up.set_text(f"{t//3600}:{(t%3600)//60:02d}:{t%60:02d}")
                 
-                ln = Gtk.Label(label=p['name']); ln.set_name("proc-title"); ln.set_xalign(0); ln.set_size_request(250, -1)
-                lp = Gtk.Label(label=str(p['pid'])); lp.set_name("proc-sub"); lp.set_xalign(0); lp.set_size_request(80, -1)
-                lc = Gtk.Label(label=f"{p['cpu']:.1f}%"); lc.set_xalign(1); lc.set_size_request(100, -1)
-                lc.set_name("val-crit" if p['cpu'] > 20 else "val-warn" if p['cpu'] > 5 else "val-safe")
-                lm = Gtk.Label(label=f"{(p['mem_kb']/1024.0):.1f} MB"); lm.set_xalign(1); lm.set_size_request(120, -1)
-                lm.set_name("val-crit" if p['mem_kb']/1024.0 > 1000 else "val-warn" if p['mem_kb']/1024.0 > 400 else "val-safe")
+            # RAM
+            if cur_page == "ram":
+                self.st_ram_use.set_text(f"{(mem_used/1024/1024):.1f} GB ({mem_pct:.0f}%)")
+                self.st_ram_tot.set_text(f"{(mem_tot/1024/1024):.1f} GB Installed")
                 
-                bb = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL); bb.set_size_request(100, -1)
-                btn = Gtk.Button(label="End Task"); btn.set_name("kill-btn"); btn.set_halign(Gtk.Align.END)
-                btn.connect("clicked", lambda b,pid=p['pid'],bx=box,rw=row: [bx.get_style_context().add_class("killed"), GLib.timeout_add(150, lambda: os.kill(int(pid), 9) or self.proc_list.remove(rw) and False)])
-                bb.pack_end(btn, False, False, 0)
+            # Disk
+            if cur_page == "disk":
+                self.st_disk_used.set_text(f"{(disk_used/1024/1024/1024):.1f} GB ({disk_pct:.0f}%)")
+                self.st_disk_tot.set_text(f"{(disk_tot/1024/1024/1024):.1f} GB Capacity")
                 
-                box.pack_start(ln, True, True, 0); box.pack_start(lp, False, False, 0)
-                box.pack_start(lc, False, False, 0); box.pack_start(lm, False, False, 0)
-                box.pack_start(bb, False, False, 0)
-                row.add(box); self.proc_list.add(row)
-            self.proc_list.show_all()
+            # GPU
+            if cur_page == "gpu":
+                self.st_gpu_name.set_text(self.tracker.gpu_name)
+                self.st_gpu_status.set_text("Active & Running")
+                
+            # Processes Grid
+            if cur_page == "processes":
+                for row in self.proc_list.get_children(): self.proc_list.remove(row)
+                for p in procs[:40]:
+                    row = Gtk.ListBoxRow(); row.override_background_color(Gtk.StateFlags.NORMAL, Gdk.RGBA(0,0,0,0))
+                    box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL); box.set_name("process-card")
+                    
+                    ln = Gtk.Label(label=p['name']); ln.set_name("proc-title"); ln.set_xalign(0); ln.set_size_request(250, -1)
+                    lp = Gtk.Label(label=str(p['pid'])); lp.set_name("proc-sub"); lp.set_xalign(0); lp.set_size_request(80, -1)
+                    lc = Gtk.Label(label=f"{p['cpu']:.1f}%"); lc.set_xalign(1); lc.set_size_request(100, -1)
+                    lc.set_name("val-crit" if p['cpu'] > 20 else "val-warn" if p['cpu'] > 5 else "val-safe")
+                    lm = Gtk.Label(label=f"{(p['mem_kb']/1024.0):.1f} MB"); lm.set_xalign(1); lm.set_size_request(120, -1)
+                    lm.set_name("val-crit" if p['mem_kb']/1024.0 > 1000 else "val-warn" if p['mem_kb']/1024.0 > 400 else "val-safe")
+                    
+                    bb = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL); bb.set_size_request(100, -1)
+                    btn = Gtk.Button(label="End Task"); btn.set_name("kill-btn"); btn.set_halign(Gtk.Align.END)
+                    btn.connect("clicked", lambda b,pid=p['pid'],bx=box,rw=row: [bx.get_style_context().add_class("killed"), GLib.timeout_add(150, lambda: os.kill(int(pid), 9) or self.proc_list.remove(rw) and False)])
+                    bb.pack_end(btn, False, False, 0)
+                    
+                    box.pack_start(ln, True, True, 0); box.pack_start(lp, False, False, 0)
+                    box.pack_start(lc, False, False, 0); box.pack_start(lm, False, False, 0)
+                    box.pack_start(bb, False, False, 0)
+                    row.add(box); self.proc_list.add(row)
+                self.proc_list.show_all()
+        except Exception as e:
+            print("Ethereal-TaskMgr Error:", e)
         return True
 
 win = TaskManager()
