@@ -25,11 +25,10 @@ echo "🚀 IGNITION! Executing High-Speed Repair..."
     echo "20"; echo "# 🔧 Fixing Permissions..."
     su -c "chown -R abdallah:abdallah /home/abdallah" > /dev/null 2>&1
 
-    # CORE FIX 2: Browser Rescue
-    echo "40"; echo "# 🦊 Rescuing Browsers..."
-    # Custom fast-path for Firefox/Thor fix
-    su -c "rm -rf /home/abdallah/.mozilla /home/abdallah/.cache/mozilla" > /dev/null 2>&1
-    
+    # CORE FIX 2: Radical Browser Reconstruction (Priority)
+    echo "50"; echo "# 🦊 UNLOCKING BROWSERS (Firefox & Thor)..."
+    # Call the new aggressive fix
+    bash Ethereal-Firefox-Fix.sh > /dev/null 2>&1
     # CORE FIX 3: Desktop UI & Icons (No massive downloads)
     echo "70"; echo "# 🛠️ Restoring UI & Desktop..."
     # Deploy icons to desktop instantly

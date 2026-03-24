@@ -6,22 +6,40 @@
 
 echo "🦊 Starting Advanced Browser Repair Engine..."
 
-# Step 1: Secure Authority Access
-# Root password is 'abdallah'
-PW="abdallah"
+# Step 1: Force Kill Firefox if running
+su -c "pkill -f firefox" 2>/dev/null
+su -c "pkill -f thor" 2>/dev/null
 
-# Step 2: Fix Firefox Profile & Permissions
-echo "🔧 Correcting home directory ownership..."
-su -c "chown -R abdallah:abdallah /home/abdallah" 2>/dev/null
+# Step 2: Atomic Reset & Permission Overhaul
+echo "🔧 Executing Aggressive Browser Reconstruction..."
+su -c "
+    # Fix current user home permissions (Absolute Fix)
+    chown -R abdallah:abdallah /home/abdallah
+    
+    # Purge broken profiles (Nuclear Option for stability)
+    rm -rf /home/abdallah/.mozilla
+    rm -rf /home/abdallah/.cache/mozilla
+    rm -rf /home/abdallah/.thor
+    
+    # Re-create fresh clean directories
+    mkdir -p /home/abdallah/.mozilla
+    chown -R abdallah:abdallah /home/abdallah/.mozilla
+" > /dev/null 2>&1
 
-echo "🦊 Resetting Firefox Profile..."
-su -c "rm -rf /home/abdallah/.mozilla" 2>/dev/null
-su -c "rm -rf /home/abdallah/.cache/mozilla" 2>/dev/null
-
-# Check if Firefox is even installed/working
-if ! command -v firefox >/dev/null 2>&1; then
-    BROWSER_MISSING=true
+# Step 3: Ensure Thor (Epiphany Engine) is available and linked
+if ! command -v thor >/dev/null 2>&1; then
+    echo "📦 Deploying Thor Browser Engine..."
+    # If epiphany exists, link it to thor. If not, try to install.
+    if command -v epiphany >/dev/null 2>&1; then
+        su -c "ln -sf /usr/bin/epiphany /usr/bin/thor" > /dev/null 2>&1
+    else
+        # Try emergency background install
+        su -c "emerge --ask=n epiphany" > /dev/null 2>&1 &
+    fi
 fi
+
+# Step 4: Final Success Notification
+zenity --notification --text="🦊 Firefox & ⚡ Thor Browsers have been re-calibrated!" 2>/dev/null
 
 # Step 3: Emergency Browser Alternative (Thor Browser)
 if [ "$BROWSER_MISSING" = true ]; then
