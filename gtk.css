@@ -372,29 +372,47 @@ tooltip.background {
 }
 
 /* ── Context Menus (Windows 11 Style - GTK Compositor specific) ── */
-window.popup {
+/* 1. Fully strip external square window wrappers drawn by Adwaita */
+window.popup,
+window.popup.menu,
+window.popup.context-menu,
+.popup,
+.popup.menu {
     background-color: transparent !important;
+    background: transparent !important;
+    background-image: none !important;
     box-shadow: none !important;
+    border: none !important;
+    border-radius: 0px !important;
 }
 
-window.popup decoration {
-    box-shadow: 0 10px 40px rgba(0,0,0,0.7) !important;
-    border-radius: 14px !important;
-    margin: 6px !important;
-}
-
+/* 2. Style the actual menu block with rounded corners and shadows */
 window.popup menu,
+window.popup .menu,
 menu,
 .menu,
 .context-menu,
 popover {
     background-color: rgba(30,32,40, 0.97) !important;
+    background: rgba(30,32,40, 0.97) !important;
     border: 1px solid rgba(255, 255, 255, 0.12) !important;
     border-radius: 14px !important;
     padding: 6px !important;
+    margin: 8px !important; /* Forces GTK compositor to slice the shadow cleanly inside the bounds */
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.8) !important;
     color: #eeeeee !important;
 }
 
+/* 3. Ensure window decorations don't paint a hard square shadow */
+decoration,
+window.popup decoration,
+.popup decoration {
+    box-shadow: 0 8px 30px rgba(0,0,0,0.8) !important;
+    border-radius: 14px !important;
+    margin: 8px !important;
+}
+
+/* 4. Style menu items with hover states */
 menu menuitem,
 .menu menuitem,
 popover modelbutton {
@@ -405,6 +423,7 @@ popover modelbutton {
     color: #dddddd !important;
     transition: all 150ms ease !important;
     background-color: transparent !important;
+    background: transparent !important;
 }
 
 menu menuitem:hover,
