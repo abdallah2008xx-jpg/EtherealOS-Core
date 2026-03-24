@@ -1,45 +1,59 @@
 #!/bin/bash
 # ==========================================================
-# EtherealOS - Ultimate System Repair & Recovery (v1.5.0)
-# "One Click to Fix Everything"
+# EtherealOS - Ultimate System Repair (v1.8.0)
+# "TERMINAL SECURE REPAIR"
 # ==========================================================
 
-# Step 1: Secure Internal Root Access
-# Attempting proper GUI elevation via PolicyKit
-if [ "$EUID" -ne 0 ]; then
-    pkexec bash "$0" "$@"
-    exit $?
+echo "🪐 EtherealOS Recovery System [Running in Admin Mode]"
+echo "----------------------------------------------------"
+echo "🔧 Please enter the Root Password (123456) to begin repair:"
+
+# Try to get root directly in terminal
+if ! sudo -v; then
+    echo "❌ Incorrect password. Access Denied."
+    sleep 3
+    exit 1
 fi
 
-# We are now running as root!
-echo "10"; echo "# 🔍 Scanning EtherealOS Core for anomalies..." ; sleep 1
-echo "20"; echo "# 🔧 Correcting System Identity & Ownership..."
-chown -R abdallah:abdallah /home/abdallah 2>/dev/null
+echo ""
+echo "✅ Authority Granted. Starting Full Repair..."
+echo ""
 
-echo "35"; echo "# 🦊 Reassembling Browser Engine (Firefox & Thor)..."
-# Injected root power is not needed as we are already root
-bash Ethereal-Firefox-Fix.sh > /dev/null 2>&1
+(
+    # Step 1: Permissions
+    echo "10"; echo "# 🔧 Correcting System Ownership..."
+    sudo chown -R abdallah:abdallah /home/abdallah 2>/dev/null
+    sleep 1
 
-echo "50"; echo "# 🛠️ Rebuilding UI Layout & Panels..."
-bash setup-panels.sh > /dev/null 2>&1
-bash fix-dock.sh > /dev/null 2>&1
+    # Step 2: Browsers
+    echo "30"; echo "# 🦊 Repairing Browsers (Firefox & Thor)..."
+    export ROOT_PW="123456"
+    bash Ethereal-Firefox-Fix.sh > /dev/null 2>&1
+    sleep 1
 
-echo "65"; echo "# 🎨 Restoring Premium Visuals & Themes..."
-bash apply-theme.sh > /dev/null 2>&1
-bash Ethereal-Final-Polish.sh > /dev/null 2>&1
+    # Step 3: Desktop UI
+    echo "50"; echo "# 🛠️ Rebuilding UI & Desktop Dock..."
+    bash setup-panels.sh > /dev/null 2>&1
+    bash fix-dock.sh > /dev/null 2>&1
+    sleep 1
 
-echo "80"; echo "# 🔄 Syncing with EtherealCloud (GitHub Updates)..."
-git fetch origin main > /dev/null 2>&1
-git pull origin main > /dev/null 2>&1
+    # Step 4: Visuals
+    echo "70"; echo "# 🎨 Restoring Premium Themes..."
+    bash apply-theme.sh > /dev/null 2>&1
+    bash Ethereal-Final-Polish.sh > /dev/null 2>&1
+    sleep 1
 
-echo "90"; echo "# 🧹 Cleaning System Caches & Temp files..."
-sudo -A rm -rf /tmp/* 2>/dev/null
-sudo -A rm -rf /var/tmp/* 2>/dev/null
+    # Step 5: Cloud Sync
+    echo "90"; echo "# 🔄 Syncing with Ethereal GitHub..."
+    git pull origin main > /dev/null 2>&1
+    sleep 1
 
-echo "100"; echo "# ✨ EtherealOS is now in Peak Performance!"
+    echo "100"; echo "# ✨ SYSTEM REPAIRED SUCCESSFULLY!"
+) | zenity --progress --title="EtherealOS Final Repair" --percentage=0 --auto-close --width=400
+
+echo ""
+echo "🏆 Repair Complete! You can close this window."
 sleep 2
-
-zenity --info --title="Repair Complete" --text="🪐 Your EtherealOS is back to life!\n\nFixed Items:\n- Browser Permissions & Thor Engine\n- UI Layout & Dock\n- Visual Themes\n- Permission Mismatches\n- System Caches\n\nEnjoy the extraterrestrial speed!" --width=350
 
 ) | zenity --progress --title="🪐 EtherealOS Ultimate Repair" \
            --text="Initializing Repair Engine..." \
