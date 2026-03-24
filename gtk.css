@@ -6,14 +6,22 @@
  * ========================================================== */
 
 /* ── Safely Targeted Glass Window Backgrounds ── */
-/* Specifically targeting Cinnamon settings and Nemo to avoid painting the desktop black! */
+/* Target Nemo File Manager and System Settings */
 .cs-main-window,
-.nemo-window:not(.desktop):not(.nemo-desktop),
+.nemo-window,
 window.cs-main-window,
-window.nemo-window:not(.desktop):not(.nemo-desktop) {
+window.nemo-window {
     background-color: rgba(10, 12, 20, 0.92);
     background-image: none;
     color: #e8e8f8;
+}
+
+/* FIX: Ensure Nemo-Desktop does not inherit the dark glass and does not CRASH! */
+.nemo-desktop.nemo-window,
+window.nemo-desktop,
+#NemoDesktop {
+    background-color: transparent;
+    background-image: none;
 }
 
 /* ── Header / Titlebar ── */
