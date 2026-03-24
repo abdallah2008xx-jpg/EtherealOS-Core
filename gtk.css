@@ -371,13 +371,16 @@ tooltip.background {
     color: #f0f0fd;
 }
 
-/* ── Context Menus (Windows 11 Style) ── */
-window.popup,
-window.popup.menu {
+/* ── Context Menus (Windows 11 Style - GTK Compositor specific) ── */
+window.popup {
     background-color: transparent !important;
     box-shadow: none !important;
-    border: none !important;
-    border-radius: 0px !important;
+}
+
+window.popup decoration {
+    box-shadow: 0 10px 40px rgba(0,0,0,0.7) !important;
+    border-radius: 14px !important;
+    margin: 6px !important;
 }
 
 window.popup menu,
@@ -385,12 +388,10 @@ menu,
 .menu,
 .context-menu,
 popover {
-    background-color: rgba(30,32,40, 0.96) !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    border-radius: 16px !important;
+    background-color: rgba(30,32,40, 0.97) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 14px !important;
     padding: 6px !important;
-    margin: 4px !important; /* Leave room for shadow */
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.8) !important;
     color: #eeeeee !important;
 }
 
@@ -399,8 +400,8 @@ menu menuitem,
 popover modelbutton {
     border-radius: 8px !important;
     padding: 6px 14px !important;
-    margin: 2px 6px !important;
-    min-height: 28px !important;
+    margin: 2px 4px !important;
+    min-height: 26px !important;
     color: #dddddd !important;
     transition: all 150ms ease !important;
     background-color: transparent !important;
