@@ -5,28 +5,15 @@
  * like a premium glassmorphic operating system.
  * ========================================================== */
 
-/* ── Global Window Background ── */
-window,
-window.background {
+/* ── Safely Targeted Glass Window Backgrounds ── */
+/* Specifically targeting Cinnamon settings and Nemo to avoid painting the desktop black! */
+.cs-main-window,
+.nemo-window,
+window.cs-main-window,
+window.nemo-window {
     background-color: rgba(10, 12, 20, 0.92);
     background-image: none;
     color: #e8e8f8;
-}
-
-/* FIX: Prevent Nemo-Desktop from painting the wallpaper black */
-window.nemo-desktop,
-window.desktop,
-.nemo-desktop,
-.nemo-desktop.view,
-.nemo-desktop .view,
-.nemo-desktop iconview,
-#NemoDesktop,
-#NemoDesktop .view,
-#NemoDesktop.view,
-#NemoDesktop window.background {
-    background-color: transparent !important;
-    background-image: none !important;
-    box-shadow: none !important;
 }
 
 /* ── Header / Titlebar ── */
@@ -81,10 +68,13 @@ headerbar button.close:hover {
 }
 
 /* ── Main Content Area ── */
-.view,
-.cs-header,
-scrolledwindow,
-scrolledwindow viewport {
+.cs-main-window .view,
+.cs-main-window .cs-header,
+.cs-main-window scrolledwindow,
+.cs-main-window scrolledwindow viewport,
+.nemo-window .view,
+.nemo-window scrolledwindow,
+.nemo-window scrolledwindow viewport {
     background-color: rgba(12, 14, 23, 0.85);
     background-image: none;
     color: #e8e8f8;
