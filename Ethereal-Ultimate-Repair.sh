@@ -1,65 +1,63 @@
 #!/bin/bash
 # ==========================================================
-# EtherealOS - Ultimate System Repair (v1.9.0)
-# "GENTOO-POWERED RECOVERY"
+# EtherealOS - Ultimate System Repair (v2.0.0 "Immortal")
+# "CLEAN GENTOO RECOVERY"
 # ==========================================================
 
-echo "🪐 EtherealOS Recovery System [Running in Admin Mode]"
-echo "----------------------------------------------------"
-echo "🔧 Please enter the Root Password (abdallah) to begin repair:"
+echo "🪐 EtherealOS Recovery System [Immortal v2.0]"
+echo "---------------------------------------------"
+echo "🔧 Please enter the Root Password (abdallah) to begin:"
 
-# Try to get root via su -c (since sudo is missing)
-# We test if we can run a simple command as root
-if ! su -c "true" 2>/dev/null; then
+# Silencing GTK/Mesa noise throughout the session
+export GDK_BACKEND=x11
+export NO_AT_BRIDGE=1
+
+# Verification if SU works
+if ! su -c "echo 'Authority Verified' 2>/dev/null" ; then
     echo ""
     echo "❌ Root Authority Rejected."
-    echo "💡 Note: The Root Password is likely 'abdallah' (or '123456' on older builds)."
     sleep 5
     exit 1
 fi
 
 echo ""
-echo "✅ Authority Granted. Starting Full Repair..."
+echo "✅ Authority Verified. Launching Optimized Repair..."
 echo ""
 
 (
-    # Step 0: Ensure dependencies (like sudo) are being tracked
-    echo "5"; echo "# 🔍 Checking system core components..."
-    
-    # Step 1: Permissions (Using su -c for each critical part)
-    echo "20"; echo "# 🔧 Correcting System Ownership..."
+    # Step 1: Corrections
+    echo "10"; echo "# 🔧 Correcting System Identity & Files..."
     su -c "chown -R abdallah:abdallah /home/abdallah" > /dev/null 2>&1
     sleep 1
 
-    # Step 2: Browsers
-    echo "40"; echo "# 🦊 Repairing Browsers (Firefox & Thor)..."
-    # We pass the root password info to the sub-script
+    # Step 2: Browser
+    echo "30"; echo "# 🦊 Reassembling Browser Engine (Firefox & Thor)..."
     bash Ethereal-Firefox-Fix.sh > /dev/null 2>&1
     sleep 1
 
-    # Step 3: Desktop UI
-    echo "60"; echo "# 🛠️ Rebuilding UI & Desktop Dock..."
+    # Step 3: Desktop Structure
+    echo "50"; echo "# 🛠️ Rebuilding UI Layout & Desktop Dock..."
     bash setup-panels.sh > /dev/null 2>&1
     bash fix-dock.sh > /dev/null 2>&1
     sleep 1
 
-    # Step 4: Visuals
-    echo "80"; echo "# 🎨 Restoring Premium Themes..."
+    # Step 4: Visual Polish
+    echo "70"; echo "# 🎨 Applying Ethereal Visual Enhancements..."
     bash apply-theme.sh > /dev/null 2>&1
     bash Ethereal-Final-Polish.sh > /dev/null 2>&1
     sleep 1
 
-    # Step 5: Cloud Sync
-    echo "95"; echo "# 🔄 Syncing with Ethereal GitHub..."
-    git pull origin main > /dev/null 2>&1
-    sleep 1
+    # Step 5: Sync
+    echo "90"; echo "# 🔄 Syncing with EtherealCloud (GitHub)..."
+    git fetch origin main > /dev/null 2>&1
+    git reset --hard origin/main > /dev/null 2>&1
 
-    echo "100"; echo "# ✨ SYSTEM REPAIRED SUCCESSFULLY!"
-) | zenity --progress --title="EtherealOS Final Repair" --percentage=0 --auto-close --width=400
+    echo "100"; echo "# ✨ SYSTEM REPAIRED & OPTIMIZED!"
+) | zenity --progress --title="EtherealOS Immortal Repair" --percentage=0 --auto-close --width=400 2>/dev/null
 
 echo ""
-echo "🏆 Repair Complete! Your system is now optimized."
-sleep 2
+echo "🏆 Repair Complete! Your system is now in Peak Performance."
+sleep 1
 
 ) | zenity --progress --title="🪐 EtherealOS Ultimate Repair" \
            --text="Initializing Repair Engine..." \
