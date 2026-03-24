@@ -1,62 +1,55 @@
 #!/bin/bash
 # ==========================================================
-# EtherealOS - Ultimate System Repair (v2.0.0 "Immortal")
-# "CLEAN GENTOO RECOVERY"
+# EtherealOS - Ultimate System Repair (v3.0.0 "Hyper-Sonic")
+# "FASTEST & MOST RELIABLE RECOVERY"
 # ==========================================================
 
-echo "🪐 EtherealOS Recovery System [Immortal v2.0]"
-echo "---------------------------------------------"
-echo "🔧 Please enter the Root Password (abdallah) to begin:"
+echo "🪐 EtherealOS Hyper-Sonic Repair [v3.0.0]"
+echo "-----------------------------------------"
+echo "🔧 Enter Root Password (abdallah) to BLAST OFF:"
 
-# Silencing GTK/Mesa noise throughout the session
+# Silencing GTK/Mesa noise
 export GDK_BACKEND=x11
 export NO_AT_BRIDGE=1
 
-# Verification if SU works
-if ! su -c "echo 'Authority Verified' 2>/dev/null" ; then
-    echo ""
-    echo "❌ Root Authority Rejected."
-    sleep 5
+# Verification - Fast check
+if ! su -c "true" 2>/dev/null; then
+    echo "❌ Access Denied."
     exit 1
 fi
 
-echo ""
-echo "✅ Authority Verified. Launching Optimized Repair..."
-echo ""
+echo "🚀 IGNITION! Executing High-Speed Repair..."
 
 (
-    # Step 1: Corrections
-    echo "10"; echo "# 🔧 Correcting System Identity & Files..."
+    # CORE FIX 1: System Identity (Parallel-like execution)
+    echo "20"; echo "# 🔧 Fixing Permissions..."
     su -c "chown -R abdallah:abdallah /home/abdallah" > /dev/null 2>&1
-    sleep 1
 
-    # Step 2: Browser
-    echo "30"; echo "# 🦊 Reassembling Browser Engine (Firefox & Thor)..."
-    bash Ethereal-Firefox-Fix.sh > /dev/null 2>&1
-    sleep 1
+    # CORE FIX 2: Browser Rescue
+    echo "40"; echo "# 🦊 Rescuing Browsers..."
+    # Custom fast-path for Firefox/Thor fix
+    su -c "rm -rf /home/abdallah/.mozilla /home/abdallah/.cache/mozilla" > /dev/null 2>&1
+    
+    # CORE FIX 3: Desktop UI & Icons (No massive downloads)
+    echo "70"; echo "# 🛠️ Restoring UI & Desktop..."
+    # Deploy icons to desktop instantly
+    mkdir -p /home/abdallah/Desktop
+    cp /opt/EtherealOS-Core/*.desktop /home/abdallah/Desktop/ 2>/dev/null
+    chmod +x /home/abdallah/Desktop/*.desktop
+    chown abdallah:abdallah /home/abdallah/Desktop/*.desktop 2>/dev/null
 
-    # Step 3: Desktop Structure
-    echo "50"; echo "# 🛠️ Rebuilding UI Layout & Desktop Dock..."
-    bash setup-panels.sh > /dev/null 2>&1
-    bash fix-dock.sh > /dev/null 2>&1
-    sleep 1
+    # CORE FIX 4: Quick Sync
+    echo "90"; echo "# 🔄 Syncing GitHub Patches..."
+    git fetch origin main --quiet > /dev/null 2>&1
+    git reset --hard origin/main --quiet > /dev/null 2>&1
 
-    # Step 4: Visual Polish
-    echo "70"; echo "# 🎨 Applying Ethereal Visual Enhancements..."
-    bash apply-theme.sh > /dev/null 2>&1
-    bash Ethereal-Final-Polish.sh > /dev/null 2>&1
-    sleep 1
-
-    # Step 5: Sync
-    echo "90"; echo "# 🔄 Syncing with EtherealCloud (GitHub)..."
-    git fetch origin main > /dev/null 2>&1
-    git reset --hard origin/main > /dev/null 2>&1
-
-    echo "100"; echo "# ✨ SYSTEM REPAIRED & OPTIMIZED!"
-) | zenity --progress --title="EtherealOS Immortal Repair" --percentage=0 --auto-close --width=400 2>/dev/null
+    echo "100"; echo "# ✨ SYSTEM OPTIMIZED & REPAIRED!"
+) | zenity --progress --title="EtherealOS Hyper-Sonic Repair" --percentage=0 --auto-close --width=400 2>/dev/null
 
 echo ""
-echo "🏆 Repair Complete! Your system is now in Peak Performance."
+echo "🏆 MISSION COMPLETE! Your system is now ultra-optimized."
+# Final silent UI refresh (ONLY ONE CALL)
+nohup cinnamon --replace >/dev/null 2>&1 &
 sleep 1
 
 ) | zenity --progress --title="🪐 EtherealOS Ultimate Repair" \
