@@ -1,12 +1,12 @@
 #!/bin/bash
 # ==========================================================
-# EtherealOS Update 1.2.0 - Graphical Auto-Updater
+# EtherealOS Update 1.4.0 - Graphical Auto-Updater
 # Replaces the old terminal update with a premium Windows-style UI
 # ==========================================================
 
 (
 # --- FORCED PROOF OF NOTIFICATION ---
-zenity --info --title="🪐 EtherealOS Update Available!" --text="Your system has discovered 3 new extraterrestrial updates on GitHub.\n\nApplying them now..." --width=400 2>/dev/null
+zenity --info --title="🪐 EtherealOS Update Available!" --text="Your system has discovered 5 new extraterrestrial updates on GitHub.\n\nApplying them now..." --width=400 2>/dev/null
 
 echo "10"; echo "# 📡 Contacting Ethereal Update Servers..." ; sleep 1
 cd "$(dirname "$0")"
@@ -29,9 +29,9 @@ echo "70"; echo "# ⚙️ Installing Core Updates & Recompiling System..."
 bash Ethereal-Final-Polish.sh > /dev/null 2>&1
 bash apply-theme.sh > /dev/null 2>&1
 
-# Apply Firefox Patch
+# Apply Firefox/Thor Patch
 if [ -f "Ethereal-Firefox-Fix.sh" ]; then
-    echo "80"; echo "# 🦊 Patching Firefox Profile Permissions..."
+    echo "80"; echo "# 🦊 Patching Browser System & Thor Integration..."
     bash Ethereal-Firefox-Fix.sh > /dev/null 2>&1
 fi
 
@@ -44,7 +44,7 @@ fi
 
     echo "100"; echo "# ✨ EtherealOS Update Successfully Installed!"
     sleep 2
-    zenity --info --title="Update Success" --text="Update v1.3.0 Applied!\n\nNew Features Added:\n- Ethereal Snipping Tool (Win + Shift + S)\n- Firefox Deep Permission Fix\n- Premium GUI Updater\n- Ethereal Game Boost.\n\nEnjoy the extraterrestrial performance!" --width=350 &
+    zenity --info --title="Update Success" --text="Update v1.4.0 Applied!\n\nNew Features Added:\n- ⚡ Thor Browser Integration\n- Firefox Deep Permission Fix\n- Premium GUI Updater\n- Ethereal Game Boost.\n\nEnjoy the extraterrestrial performance!" --width=350 &
 ) | zenity --progress --title="🪐 EtherealOS System Update" \
            --text="Initializing Update Engine..." \
            --percentage=0 --auto-close --auto-kill --width=450
