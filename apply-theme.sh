@@ -44,8 +44,15 @@ gsettings set org.cinnamon enabled-applets "['panel1:left:0:menu@cinnamon.org:0'
 
 echo "[2/9] ✅ Panels configured (Top bar + Left sidebar + Bottom dock)."
 
-# ── 3. Set Ethereal/Dark Theme ──
+# ── 3. Set Ethereal/Dark Theme & Live Reload ──
 gsettings set org.cinnamon.theme name "Ethereal"
+gsettings set org.cinnamon.desktop.interface gtk-theme "Adwaita-dark"
+gsettings set org.cinnamon.desktop.wm.preferences theme "Adwaita-dark"
+
+# Live reload the theme CSS using D-Bus (No heavy restart needed!)
+dbus-send --session --dest=org.Cinnamon --print-reply /org/Cinnamon org.Cinnamon.Eval string:'let Main = imports.ui.main; Main.themeManager._changeTheme();' > /dev/null 2>&1 || gsettings set org.cinnamon.theme name "Ethereal"
+
+echo "[3/9] ✅ Dark GTK theme set & dynamically reloaded."
 gsettings set org.cinnamon.desktop.interface gtk-theme "Adwaita-dark"
 gsettings set org.cinnamon.desktop.wm.preferences theme "Adwaita-dark"
 echo "[3/9] ✅ Dark GTK theme set."
