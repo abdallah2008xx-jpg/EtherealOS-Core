@@ -13,6 +13,19 @@ window.background {
     color: #e8e8f8;
 }
 
+/* FIX: Prevent Nemo-Desktop from painting the wallpaper black */
+window.desktop,
+window.nemo-desktop,
+.nemo-desktop.nemo-canvas-item,
+.nemo-desktop.view,
+#NemoDesktop,
+#NemoDesktop window.background,
+#NemoDesktop .view {
+    background-color: transparent;
+    background-image: none;
+    box-shadow: none;
+}
+
 /* ── Header / Titlebar ── */
 headerbar,
 .titlebar {
