@@ -9,6 +9,11 @@ echo "🪐 Welcome to EtherealOS Deployment."
 # 1. Directories
 mkdir -p ~/.config/autostart
 mkdir -p ~/.local/bin
+mkdir -p ~/.local/share/icons/ethereal
+
+# Install Icons
+echo "🎨 Installing App Icons..."
+cp icons/*.svg ~/.local/share/icons/ethereal/ 2>/dev/null
 
 # Enable Background Updater 
 cp Ethereal-Notifier-Autostart.desktop ~/.config/autostart/Ethereal-Notifier.desktop 2>/dev/null
