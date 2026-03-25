@@ -55,9 +55,12 @@ fi
 
 echo "10"; echo "# 📡 Contacting Ethereal Servers..." ; sleep 1
 
-echo "25"; echo "# 📸 Creating Safety Snapshot..."
-# Use pkexec to ensure a graphical prompt if needed
-pkexec timeshift --create --comments "Auto-Snapshot before Update" --tags O > /dev/null 2>&1
+echo "25"; echo "# 📸 Creating Safety Snapshot & Syncing..."
+# Ethereal-Safe-Update.sh handles its own elevation and snapshotting.
+# We call it to perform the core system update safely.
+if [ -f "$REPO_DIR/Ethereal-Safe-Update.sh" ]; then
+    bash "$REPO_DIR/Ethereal-Safe-Update.sh" > /dev/null 2>&1
+fi
 sleep 1
 
 echo "35"; echo "# ⬇️ Downloading Updates..."
@@ -74,7 +77,8 @@ if command -v flatpak >/dev/null 2>&1; then
 fi
 # Ensure Snapd is running
 if command -v snap >/dev/null 2>&1; then
-    pkexec rc-service snapd start 2>/dev/null || true
+    # snapd service start now handled in Final-Polish as root
+    true
 fi
 
 echo "45"; echo "# 🧹 Cleaning old Ethereal launchers..."

@@ -1,8 +1,17 @@
-#!/bin/bash
 # ==========================================================
 # EtherealOS - ZRAM Performance Engine v1.0
 # "Compressed Speed" - RAM-based Swap Protection
 # ==========================================================
+
+# ── Privilege Check: Self-Elevate if needed ──
+if [ "$(id -u)" -ne 0 ]; then
+    echo "🔑 ZRAM Setup: Admin privileges required."
+    if command -v pkexec >/dev/null 2>&1; then
+        exec pkexec bash "$0" "$@"
+    else
+        exec sudo bash "$0" "$@"
+    fi
+fi
 
 echo "⚡ Initializing ZRAM Engine..."
 

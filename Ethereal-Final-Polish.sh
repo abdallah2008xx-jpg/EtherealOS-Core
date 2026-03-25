@@ -1,24 +1,37 @@
-#!/bin/bash
 # ==========================================================
 # EtherealOS Final Polish
 # Fills in the missing visual gaps: Window Borders, Cursors, 
 # and a glorious Terminal Welcome Screen.
 # ==========================================================
 
+# ── Privilege Check: Self-Elevate if needed ──
+# This ensures the user is prompted only ONCE for the entire script.
+if [ "$(id -u)" -ne 0 ]; then
+    echo "🔑 EtherealOS: Admin privileges required. Please authenticate once."
+    if command -v pkexec >/dev/null 2>&1; then
+        exec pkexec bash "$0" "$@"
+    else
+        exec sudo bash "$0" "$@"
+    fi
+fi
+
+# Determine the original user to keep home directory operations correct
+REAL_USER="${SUDO_USER:-$USER}"
+REAL_HOME=$(getent passwd "$REAL_USER" | cut -d: -f6)
+
 echo "1. Installing Premium Window Borders (WhiteSur Theme for Metacity/GTK)..."
-mkdir -p ~/.themes
-wget -qO- https://raw.githubusercontent.com/vinceliuice/WhiteSur-gtk-theme/master/install.sh | bash -s -- -d ~/.themes -t all -N glassy
+mkdir -p "$REAL_HOME/.themes"
+# Run the theme installer as the real user to avoid root-owned files in home
+su - "$REAL_USER" -c "wget -qO- https://raw.githubusercontent.com/vinceliuice/WhiteSur-gtk-theme/master/install.sh | bash -s -- -d $REAL_HOME/.themes -t all -N glassy"
 
 echo "2. Applying the Window Borders & GTK UI..."
-# This changes the "Titlebar" and window buttons (Close/Minimize) to be incredibly sleek
-gsettings set org.cinnamon.desktop.wm.preferences theme 'WhiteSur-Dark'
-gsettings set org.cinnamon.desktop.interface gtk-theme 'WhiteSur-Dark'
+su - "$REAL_USER" -c "gsettings set org.cinnamon.desktop.wm.preferences theme 'WhiteSur-Dark'"
+su - "$REAL_USER" -c "gsettings set org.cinnamon.desktop.interface gtk-theme 'WhiteSur-Dark'"
 
 echo "3. Installing Official EtherealOS Premium Icon Engine (Papirus)..."
-mkdir -p ~/.icons
-# Securely download and install Papirus directly into user's .icons folder
-wget -qO- https://raw.githubusercontent.com/PapirusDevelopmentTeam/papirus-icon-theme/master/install.sh | DESTDIR="$HOME/.icons" sh 2>/dev/null || true
-gsettings set org.cinnamon.desktop.interface icon-theme 'Papirus-Dark'
+mkdir -p "$REAL_HOME/.icons"
+su - "$REAL_USER" -c "wget -qO- https://raw.githubusercontent.com/PapirusDevelopmentTeam/papirus-icon-theme/master/install.sh | DESTDIR=\"$REAL_HOME/.icons\" sh 2>/dev/null || true"
+su - "$REAL_USER" -c "gsettings set org.cinnamon.desktop.interface icon-theme 'Papirus-Dark'"
 
 echo "4. Configuring Ultra-Premium Navigation Animations..."
 # Enable 3D Coverflow for Alt-Tab Window Navigation! (Like macOS / Compiz)
@@ -29,24 +42,26 @@ gsettings set org.cinnamon.muffin wobbly-windows true
 gsettings set org.cinnamon.muffin desktop-effects true
 
 echo "3. Installing Premium Mouse Cursor (Capitaine/Mac Style)..."
-mkdir -p ~/.icons
-if [ ! -d ~/.icons/capitaine-cursors ]; then
-    wget -qO- https://github.com/keeferrourke/capitaine-cursors/releases/latest/download/capitaine-cursors-linux.tar.gz | tar -xz -C ~/.icons/
+mkdir -p "$REAL_HOME/.icons"
+if [ ! -d "$REAL_HOME/.icons/capitaine-cursors" ]; then
+    su - "$REAL_USER" -c "wget -qO- https://github.com/keeferrourke/capitaine-cursors/releases/latest/download/capitaine-cursors-linux.tar.gz | tar -xz -C $REAL_HOME/.icons/"
 fi
-gsettings set org.cinnamon.desktop.interface cursor-theme 'capitaine-cursors'
+su - "$REAL_USER" -c "gsettings set org.cinnamon.desktop.interface cursor-theme 'capitaine-cursors'"
 
 # Ensure Cursor Consistency (Inheritance for X11/GTK apps)
-mkdir -p ~/.icons/default
+mkdir -p "$REAL_HOME/.icons/default"
 echo "[Icon Theme]
-Inherits=capitaine-cursors" > ~/.icons/default/index.theme
+Inherits=capitaine-cursors" > "$REAL_HOME/.icons/default/index.theme"
+chown -R "$REAL_USER:$REAL_USER" "$REAL_HOME/.icons/default"
+
 # Also set for X11 specifically
-echo "Xcursor.theme: capitaine-cursors" >> ~/.Xresources
-xrdb -merge ~/.Xresources 2>/dev/null || true
+echo "Xcursor.theme: capitaine-cursors" >> "$REAL_HOME/.Xresources"
+su - "$REAL_USER" -c "xrdb -merge $REAL_HOME/.Xresources" 2>/dev/null || true
 
 echo "4. Injecting EtherealOS Logo into Terminal (Neofetch)..."
 # Create a custom ascii logo for EtherealOS
-mkdir -p ~/.config/neofetch
-cat << 'EOF' > ~/.config/neofetch/ethereal.txt
+mkdir -p "$REAL_HOME/.config/neofetch"
+cat << 'EOF' > "$REAL_HOME/.config/neofetch/ethereal.txt"
 ${c1}
     . . .    
   .       .  
@@ -56,10 +71,11 @@ ${c1}
   .       .  
     . . .    
 EOF
+chown -R "$REAL_USER:$REAL_USER" "$REAL_HOME/.config/neofetch"
 
 # Only add neofetch if it's not already in .bashrc
-if ! grep -q "neofetch --source ~/.config/neofetch/ethereal.txt" "$HOME/.bashrc" 2>/dev/null; then
-    echo "command -v neofetch >/dev/null 2>&1 && neofetch --source ~/.config/neofetch/ethereal.txt --ascii_colors 6 4" >> "$HOME/.bashrc"
+if ! grep -q "neofetch --source $REAL_HOME/.config/neofetch/ethereal.txt" "$REAL_HOME/.bashrc" 2>/dev/null; then
+    echo "command -v neofetch >/dev/null 2>&1 && neofetch --source $REAL_HOME/.config/neofetch/ethereal.txt --ascii_colors 6 4" >> "$REAL_HOME/.bashrc"
 fi
 
 echo "5. Adding Windows+Shift+S for Snip/Area Screenshot..."
@@ -80,76 +96,76 @@ echo "6. Enabling Flatpak & Snap Support (Binary Apps)..."
 # This allows users to install apps without waiting for long compile times.
 if ! command -v flatpak >/dev/null 2>&1; then
     echo "   → Installing Flatpak..."
-    pkexec emerge --ask=n --quiet sys-apps/flatpak 2>/dev/null || true
+    emerge --ask=n --quiet sys-apps/flatpak 2>/dev/null || true
 fi
 if command -v flatpak >/dev/null 2>&1; then
     echo "   → Adding Flathub Repository..."
-    flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+    su - "$REAL_USER" -c "flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo"
 fi
 
 if ! command -v snap >/dev/null 2>&1; then
     echo "   → Installing Snapd..."
-    pkexec emerge --ask=n --quiet app-containers/snapd 2>/dev/null || true
+    emerge --ask=n --quiet app-containers/snapd 2>/dev/null || true
 fi
 if command -v snap >/dev/null 2>&1; then
     echo "   → Enabling Snap Service..."
-    pkexec rc-update add snapd default 2>/dev/null || true
-    pkexec rc-service snapd start 2>/dev/null || true
+    rc-update add snapd default 2>/dev/null || true
+    rc-service snapd start 2>/dev/null || true
     # Create the /snap symlink if it doesn't exist
-    [ ! -L /snap ] && pkexec ln -s /var/lib/snapd/snap /snap 2>/dev/null || true
+    [ ! -L /snap ] && ln -s /var/lib/snapd/snap /snap 2>/dev/null || true
 fi
 
 echo "7. Enhancing Hardware (Battery, Printing, Bluetooth)..."
 # A. Power Management (TLP)
 if ! command -v tlp >/dev/null 2>&1; then
     echo "   → Installing TLP Power Management..."
-    pkexec emerge --ask=n --quiet sys-power/tlp 2>/dev/null || true
+    emerge --ask=n --quiet sys-power/tlp 2>/dev/null || true
 fi
 if command -v tlp >/dev/null 2>&1; then
-    pkexec rc-update add tlp default 2>/dev/null || true
-    pkexec rc-service tlp start 2>/dev/null || true
+    rc-update add tlp default 2>/dev/null || true
+    rc-service tlp start 2>/dev/null || true
 fi
 
 # B. Printing Support (CUPS & Drivers)
 if ! command -v cupsd >/dev/null 2>&1; then
     echo "   → Installing CUPS & Printer Drivers..."
-    sudo emerge --ask=n --quiet net-print/cups net-print/foomatic-db net-print/foomatic-db-engine net-print/gutenprint 2>/dev/null || true
+    emerge --ask=n --quiet net-print/cups net-print/foomatic-db net-print/foomatic-db-engine net-print/gutenprint 2>/dev/null || true
 fi
 if command -v cupsd >/dev/null 2>&1; then
-    sudo rc-update add cupsd default 2>/dev/null || true
-    sudo rc-service cupsd start 2>/dev/null || true
+    rc-update add cupsd default 2>/dev/null || true
+    rc-service cupsd start 2>/dev/null || true
 fi
 
 # C. Bluetooth Support (Bluez & Blueman)
 if ! command -v bluetoothd >/dev/null 2>&1; then
     echo "   → Installing Bluetooth Stack..."
-    sudo emerge --ask=n --quiet net-wireless/bluez net-wireless/blueman 2>/dev/null || true
+    emerge --ask=n --quiet net-wireless/bluez net-wireless/blueman 2>/dev/null || true
 fi
 if command -v bluetoothd >/dev/null 2>&1; then
-    pkexec rc-update add bluetooth default 2>/dev/null || true
-    pkexec rc-service bluetooth start 2>/dev/null || true
-    # Fix: Enable Bluetooth Auto-Connect (耳机自动连接)
+    rc-update add bluetooth default 2>/dev/null || true
+    rc-service bluetooth start 2>/dev/null || true
+    # Fix: Enable Bluetooth Auto-Connect
     if [ -f /etc/bluetooth/main.conf ]; then
-        pkexec sed -i 's/^#AutoEnable=false/AutoEnable=true/' /etc/bluetooth/main.conf
-        pkexec sed -i 's/^AutoEnable=false/AutoEnable=true/' /etc/bluetooth/main.conf
+        sed -i 's/^#AutoEnable=false/AutoEnable=true/' /etc/bluetooth/main.conf
+        sed -i 's/^AutoEnable=false/AutoEnable=true/' /etc/bluetooth/main.conf
     fi
 fi
 
 # D. Thermal Management (thermald)
 if ! command -v thermald >/dev/null 2>&1; then
     echo "   → Installing Thermal Management (CPU Protection)..."
-    sudo emerge --ask=n --quiet sys-apps/thermald 2>/dev/null || true
+    emerge --ask=n --quiet sys-apps/thermald 2>/dev/null || true
 fi
 if command -v thermald >/dev/null 2>&1; then
-    sudo rc-update add thermald default 2>/dev/null || true
-    sudo rc-service thermald start 2>/dev/null || true
+    rc-update add thermald default 2>/dev/null || true
+    rc-service thermald start 2>/dev/null || true
 fi
 
 # E. Auto-Mount Support (gvfs & udisks)
 echo "   → Configuring Auto-Mount for External Drives..."
-pkexec emerge --ask=n --quiet gnome-base/gvfs sys-apps/udisks 2>/dev/null || true
-pkexec rc-update add udisks2 default 2>/dev/null || true
-pkexec rc-service udisks2 start 2>/dev/null || true
+emerge --ask=n --quiet gnome-base/gvfs sys-apps/udisks 2>/dev/null || true
+rc-update add udisks2 default 2>/dev/null || true
+rc-service udisks2 start 2>/dev/null || true
 
 # Configure Cinnamon to auto-mount when a drive is plugged in
 gsettings set org.cinnamon.desktop.media-handling automount true 2>/dev/null
@@ -164,17 +180,18 @@ fi
 echo "9. Deploying Glassmorphism Notification System (Dunst)..."
 # Ensure dunst is installed
 if ! command -v dunst >/dev/null 2>&1; then
-    sudo emerge --ask=n --quiet x11-misc/dunst 2>/dev/null || true
+    emerge --ask=n --quiet x11-misc/dunst 2>/dev/null || true
 fi
 # Deploy Dunst config
-mkdir -p ~/.config/dunst
+mkdir -p "$REAL_HOME/.config/dunst"
 if [ -f "$(dirname "$0")/dunstrc" ]; then
-    cp "$(dirname "$0")/dunstrc" ~/.config/dunst/dunstrc
+    cp "$(dirname "$0")/dunstrc" "$REAL_HOME/.config/dunst/dunstrc"
+    chown -R "$REAL_USER:$REAL_USER" "$REAL_HOME/.config/dunst"
 fi
 
 echo "10. Integrating Privacy Portals (Flatpak/XDG)..."
 # Install XDG Desktop Portals for camera/mic permission prompts
-pkexec emerge --ask=n --quiet sys-apps/xdg-desktop-portal sys-apps/xdg-desktop-portal-gtk sys-apps/xdg-desktop-portal-xapp 2>/dev/null || true
+emerge --ask=n --quiet sys-apps/xdg-desktop-portal sys-apps/xdg-desktop-portal-gtk sys-apps/xdg-desktop-portal-xapp 2>/dev/null || true
 
 echo "11. Enabling Fractional Scaling (HiDPI Support)..."
 # Enable experimental fractional scaling in Cinnamon
@@ -187,40 +204,45 @@ gsettings set org.cinnamon.settings-daemon.plugins.color night-light-schedule-au
 
 echo "13. Deploying Automated Maintenance (Trash & Tmp Cleaning)..."
 # Create a cleanup script that removes files older than 30 days
-cat << 'EOF' | pkexec tee /usr/local/bin/ethereal-cleanup.sh > /dev/null
+CLEAN_SCRIPT="/usr/local/bin/ethereal-cleanup.sh"
+cat << 'EOF' > "$CLEAN_SCRIPT"
 #!/bin/bash
 # EtherealOS Maintenance - Clean Trash and Tmp (>30 days)
-find ~/.local/share/Trash/files/* -mtime +30 -exec rm -rf {} + 2>/dev/null
-pkexec find /tmp -type f -atime +30 -delete 2>/dev/null
+# Identify the user's home
+REAL_USER="abdallah"
+REAL_HOME="/home/$REAL_USER"
+find "$REAL_HOME/.local/share/Trash/files/"* -mtime +30 -exec rm -rf {} + 2>/dev/null
+find /tmp -type f -atime +30 -delete 2>/dev/null
 EOF
-pkexec chmod +x /usr/local/bin/ethereal-cleanup.sh
-# Add to crontab (Weekly at midnight on Sunday)
-(crontab -l 2>/dev/null; echo "0 0 * * 0 /usr/local/bin/ethereal-cleanup.sh") | crontab - 2>/dev/null || true
+chmod +x "$CLEAN_SCRIPT"
+
+# Add to crontab for the root user
+(crontab -l 2>/dev/null | grep -v "$CLEAN_SCRIPT"; echo "0 0 * * 0 $CLEAN_SCRIPT") | crontab - 2>/dev/null || true
 
 echo "14. Installing Office & PDF Suite (BTEC Ready)..."
 # A. Okular (Premium PDF with Signing/Annotations)
 if ! command -v okular >/dev/null 2>&1; then
     echo "   → Installing Okular (PDF Reader)..."
-    sudo emerge --ask=n --quiet kde-apps/okular 2>/dev/null || true
+    emerge --ask=n --quiet kde-apps/okular 2>/dev/null || true
 fi
 
 # B. OnlyOffice (Microsoft Office Alternative via Flatpak)
 if command -v flatpak >/dev/null 2>&1; then
     echo "   → Installing OnlyOffice Desktop Editors..."
-    flatpak install --noninteractive flathub org.onlyoffice.desktopeditors 2>/dev/null || true
+    su - "$REAL_USER" -c "flatpak install --noninteractive flathub org.onlyoffice.desktopeditors" 2>/dev/null || true
 fi
 
 echo "15. Dynamic Swap Management (Swapspace)..."
 if ! command -v swapspace >/dev/null 2>&1; then
     echo "   → Installing Dynamic Swap Manager (Swapspace)..."
-    sudo emerge --ask=n --quiet sys-apps/swapspace 2>/dev/null || true
+    emerge --ask=n --quiet sys-apps/swapspace 2>/dev/null || true
 fi
 if command -v swapspace >/dev/null 2>&1; then
     echo "   → Enabling Dynamic Swap Service..."
     # Ensure the config exists and points to /var/lib/swapspace
-    sudo mkdir -p /var/lib/swapspace
-    sudo rc-update add swapspace default 2>/dev/null || true
-    sudo rc-service swapspace start 2>/dev/null || true
+    mkdir -p /var/lib/swapspace
+    rc-update add swapspace default 2>/dev/null || true
+    rc-service swapspace start 2>/dev/null || true
 fi
 
 echo "16. Optimizing System Core (Pro Gaming Kernel)..."
@@ -235,17 +257,17 @@ fi
 
 echo "17. Optimizing Storage (Btrfs Zstd)..."
 if [ -f "$(dirname "$0")/Ethereal-Optimize-Storage.sh" ]; then
-    sudo bash "$(dirname "$0")/Ethereal-Optimize-Storage.sh"
+    bash "$(dirname "$0")/Ethereal-Optimize-Storage.sh"
 fi
 
 echo "18. Enhancing System Stability (OOM Protection)..."
 if [ -f "$(dirname "$0")/Ethereal-Stability-Fix.sh" ]; then
-    sudo bash "$(dirname "$0")/Ethereal-Stability-Fix.sh"
+    bash "$(dirname "$0")/Ethereal-Stability-Fix.sh"
 fi
 
 echo "19. Securing System (Firewall Setup)..."
 if [ -f "$(dirname "$0")/Ethereal-Security-Setup.sh" ]; then
-    sudo bash "$(dirname "$0")/Ethereal-Security-Setup.sh"
+    bash "$(dirname "$0")/Ethereal-Security-Setup.sh"
 fi
 
 echo "EtherealOS Final Polish Complete!"

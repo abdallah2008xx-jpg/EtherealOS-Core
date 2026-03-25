@@ -1,8 +1,17 @@
-#!/bin/bash
 # ==========================================================
 # EtherealOS - Boot Animation & Startup Sound v1.0
 # "The First Impression" - Plymouth & Audio Setup
 # ==========================================================
+
+# ── Privilege Check: Self-Elevate if needed ──
+if [ "$(id -u)" -ne 0 ]; then
+    echo "🔑 Boot Setup: Admin privileges required."
+    if command -v pkexec >/dev/null 2>&1; then
+        exec pkexec bash "$0" "$@"
+    else
+        exec sudo bash "$0" "$@"
+    fi
+fi
 
 echo "🔊 Initializing EtherealOS Boot Experience..."
 
