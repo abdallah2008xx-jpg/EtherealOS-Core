@@ -54,6 +54,12 @@ mkdir -p /home/abdallah/Desktop
 find "$REPO_DIR" -maxdepth 1 -name "*.desktop" ! -name "*-Autostart.desktop" -exec cp {} /home/abdallah/Desktop/ \;
 chmod +x /home/abdallah/Desktop/*.desktop 2>/dev/null
 
+# Mark desktop files as trusted (Cinnamon/Nemo requirement)
+echo "58"; echo "# 🔐 Marking launchers as trusted..."
+for file in /home/abdallah/Desktop/*.desktop; do
+    [ -f "$file" ] && gio set "$file" metadata::trusted true 2>/dev/null || true
+done
+
 # Update icons
 echo "60"; echo "# 🎨 Updating App Icons..."
 mkdir -p /home/abdallah/.local/share/icons/ethereal

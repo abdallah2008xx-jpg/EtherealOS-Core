@@ -31,6 +31,12 @@ echo "🚀 Deploying Desktop Suite..."
 cp *.desktop ~/Desktop/ 2>/dev/null
 chmod +x ~/Desktop/*.desktop 2>/dev/null
 
+# Mark desktop files as trusted (Cinnamon/Nemo requirement)
+echo "🔐 Marking launchers as trusted..."
+for file in ~/Desktop/*.desktop; do
+    [ -f "$file" ] && gio set "$file" metadata::trusted true 2>/dev/null || true
+done
+
 # 4. Final Polish
 echo "✨ Finishing touches (Icons & Cursors)..."
 bash Ethereal-Final-Polish.sh
