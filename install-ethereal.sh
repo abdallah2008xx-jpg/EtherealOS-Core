@@ -11,9 +11,13 @@ mkdir -p ~/.config/autostart
 mkdir -p ~/.local/bin
 mkdir -p ~/.local/share/icons/ethereal
 
-# Install Icons
+# Install Ethereal custom icons
 echo "🎨 Installing App Icons..."
 cp icons/*.svg ~/.local/share/icons/ethereal/ 2>/dev/null
+
+# Install Papirus icon theme (complete icon pack)
+echo "📦 Installing Papirus Icon Theme (complete pack)..."
+bash install-papirus-icons.sh 2>/dev/null || echo "⚠️ Papirus install skipped (offline)"
 
 # Enable Background Updater 
 cp Ethereal-Notifier-Autostart.desktop ~/.config/autostart/Ethereal-Notifier.desktop 2>/dev/null

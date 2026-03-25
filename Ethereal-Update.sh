@@ -59,6 +59,10 @@ echo "60"; echo "# 🎨 Updating App Icons..."
 mkdir -p /home/abdallah/.local/share/icons/ethereal
 cp "$REPO_DIR"/icons/*.svg /home/abdallah/.local/share/icons/ethereal/ 2>/dev/null
 
+# Update Papirus icon theme
+echo "65"; echo "# 📦 Updating Papirus Icon Theme..."
+bash "$REPO_DIR"/install-papirus-icons.sh 2>/dev/null || true
+
 echo "80"; echo "# 🎨 Applying Theme..."
 bash apply-theme.sh > /dev/null 2>&1
 
