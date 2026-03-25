@@ -139,11 +139,11 @@ else
 fi
 
 if [ "$SQUASH_SIZE" -eq 0 ]; then
-    echo "🗜️ Building squashfs.img (xz compression)..."
+    echo "🗜️ Building squashfs.img (gzip compression)..."
     rm -f "$SQUASH_IMG" 2>/dev/null || true
     mkdir -p "$WORK/LiveOS"
     mksquashfs / "$SQUASH_IMG" \
-      -comp xz -Xbcj x86 -b 1M -processors 2 -mem 1G \
+      -comp gzip -b 256K -processors 2 -mem 1G \
       -e /proc /sys /dev /mnt /tmp /var/tmp /media /run \
          /home/abdallah/.cache /var/cache /usr/src /usr/portage /var/db/repos /var/lib/portage
     ls -lh "$SQUASH_IMG" || true
@@ -151,11 +151,11 @@ if [ "$SQUASH_SIZE" -eq 0 ]; then
 fi
 
 if [ "$SQUASH_SIZE" -ge 4294967295 ]; then
-    echo "🗜️ Rebuilding squashfs.img to fit under 4GB (xz compression)..."
+    echo "🗜️ Rebuilding squashfs.img to fit under 4GB (gzip compression)..."
     rm -f "$SQUASH_IMG" 2>/dev/null || true
     mkdir -p "$WORK/LiveOS"
     mksquashfs / "$SQUASH_IMG" \
-      -comp xz -Xbcj x86 -b 1M -processors 2 -mem 1G \
+      -comp gzip -b 256K -processors 2 -mem 1G \
       -e /proc /sys /dev /mnt /tmp /var/tmp /media /run \
          /home/abdallah/.cache /var/cache /usr/src /usr/portage /var/db/repos /var/lib/portage
     ls -lh "$SQUASH_IMG" || true
