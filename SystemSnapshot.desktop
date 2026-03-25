@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=System Snapshot 🔄
+Comment=Create a system restore point (Btrfs)
+Exec=sudo /usr/local/bin/Ethereal-Snapshot.sh
+Icon=system-reboot
+Terminal=false
+Type=Application
+Categories=System;Settings;
+Keywords=Backup;Restore;Snapshot;Timeshift;

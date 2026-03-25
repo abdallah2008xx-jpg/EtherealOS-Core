@@ -37,11 +37,34 @@ cp Ethereal-Notifier-Autostart.desktop /home/abdallah/.config/autostart/ 2>/dev/
 # STEP 2: Update & Deploy (inside zenity for UI)
 # ═══════════════════════════════════════════
 (
+echo "5"; echo "# 📶 Checking Internet Connection..."
+if ! ping -c 1 8.8.8.8 >/dev/null 2>&1; then
+    echo "Error: No internet connection. Update aborted." >&2
+    exit 1
+fi
+
 echo "10"; echo "# 📡 Contacting Ethereal Servers..." ; sleep 1
 
-echo "25"; echo "# ⬇️ Downloading Updates..."
-git pull origin main > /dev/null 2>&1
+echo "25"; echo "# 📸 Creating Safety Snapshot..."
+sudo timeshift --create --comments "Auto-Snapshot before Update" --tags O > /dev/null 2>&1
 sleep 1
+
+echo "35"; echo "# ⬇️ Downloading Updates..."
+if ! git pull origin main 2>&1; then
+    echo "Error: Failed to pull updates from GitHub." >&2
+    exit 1
+fi
+sleep 1
+
+echo "45"; echo "# 🏥 System Health Check..."
+# Ensure Flatpak is configured
+if command -v flatpak >/dev/null 2>&1; then
+    flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo 2>/dev/null
+fi
+# Ensure Snapd is running
+if command -v snap >/dev/null 2>&1; then
+    sudo rc-service snapd start 2>/dev/null || true
+fi
 
 echo "45"; echo "# 🧹 Cleaning old desktop icons..."
 # Remove ALL old .desktop files from Desktop, then re-copy fresh ones

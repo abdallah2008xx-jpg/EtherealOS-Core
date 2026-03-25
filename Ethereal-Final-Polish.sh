@@ -51,7 +51,121 @@ gsettings set org.cinnamon.desktop.keybindings.custom-keybinding:/org/cinnamon/d
 gsettings set org.cinnamon.desktop.keybindings.custom-keybinding:/org/cinnamon/desktop/keybindings/custom-keybindings/custom-snip/ command "gnome-screenshot -a" 2>/dev/null
 gsettings set org.cinnamon.desktop.keybindings.custom-keybinding:/org/cinnamon/desktop/keybindings/custom-keybindings/custom-snip/ binding "['<Shift><Super>s']" 2>/dev/null
 
-echo "6. Reloading Window Manager..."
-nohup cinnamon --replace >/dev/null 2>&1 &
+echo "6. Enabling Flatpak & Snap Support (Binary Apps)..."
+# This allows users to install apps without waiting for long compile times.
+if ! command -v flatpak >/dev/null 2>&1; then
+    echo "   → Installing Flatpak..."
+    sudo emerge --ask=n --quiet sys-apps/flatpak 2>/dev/null || true
+fi
+if command -v flatpak >/dev/null 2>&1; then
+    echo "   → Adding Flathub Repository..."
+    flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+fi
+
+if ! command -v snap >/dev/null 2>&1; then
+    echo "   → Installing Snapd..."
+    sudo emerge --ask=n --quiet app-containers/snapd 2>/dev/null || true
+fi
+if command -v snap >/dev/null 2>&1; then
+    echo "   → Enabling Snap Service..."
+    sudo rc-update add snapd default 2>/dev/null || true
+    sudo rc-service snapd start 2>/dev/null || true
+    # Create the /snap symlink if it doesn't exist
+    [ ! -L /snap ] && sudo ln -s /var/lib/snapd/snap /snap 2>/dev/null || true
+fi
+
+echo "8. Enhancing Hardware (Battery, Printing, Bluetooth)..."
+# A. Power Management (TLP)
+if ! command -v tlp >/dev/null 2>&1; then
+    echo "   → Installing TLP Power Management..."
+    sudo emerge --ask=n --quiet sys-power/tlp 2>/dev/null || true
+fi
+if command -v tlp >/dev/null 2>&1; then
+    sudo rc-update add tlp default 2>/dev/null || true
+    sudo rc-service tlp start 2>/dev/null || true
+fi
+
+# B. Printing Support (CUPS & Drivers)
+if ! command -v cupsd >/dev/null 2>&1; then
+    echo "   → Installing CUPS & Printer Drivers..."
+    sudo emerge --ask=n --quiet net-print/cups net-print/foomatic-db net-print/foomatic-db-engine net-print/gutenprint 2>/dev/null || true
+fi
+if command -v cupsd >/dev/null 2>&1; then
+    sudo rc-update add cupsd default 2>/dev/null || true
+    sudo rc-service cupsd start 2>/dev/null || true
+fi
+
+# C. Bluetooth Support (Bluez & Blueman)
+if ! command -v bluetoothd >/dev/null 2>&1; then
+    echo "   → Installing Bluetooth Stack..."
+    sudo emerge --ask=n --quiet net-wireless/bluez net-wireless/blueman 2>/dev/null || true
+fi
+if command -v bluetoothd >/dev/null 2>&1; then
+    sudo rc-update add bluetooth default 2>/dev/null || true
+    sudo rc-service bluetooth start 2>/dev/null || true
+fi
+
+# D. Thermal Management (thermald)
+if ! command -v thermald >/dev/null 2>&1; then
+    echo "   → Installing Thermal Management (CPU Protection)..."
+    sudo emerge --ask=n --quiet sys-apps/thermald 2>/dev/null || true
+fi
+if command -v thermald >/dev/null 2>&1; then
+    sudo rc-update add thermald default 2>/dev/null || true
+    sudo rc-service thermald start 2>/dev/null || true
+fi
+
+# E. Auto-Mount Support (gvfs & udisks)
+echo "   → Configuring Auto-Mount for External Drives..."
+sudo emerge --ask=n --quiet gnome-base/gvfs sys-apps/udisks 2>/dev/null || true
+sudo rc-update add udisks2 default 2>/dev/null || true
+sudo rc-service udisks2 start 2>/dev/null || true
+
+# Configure Cinnamon to auto-mount when a drive is plugged in
+gsettings set org.cinnamon.desktop.media-handling automount true 2>/dev/null
+gsettings set org.cinnamon.desktop.media-handling automount-open true 2>/dev/null
+
+echo "9. Integrating Multimedia Codecs (Video Fix)..."
+# Call the codec setup script (as root)
+if [ -f "$(dirname "$0")/Ethereal-Codecs-Setup.sh" ]; then
+    sudo bash "$(dirname "$0")/Ethereal-Codecs-Setup.sh"
+fi
+
+echo "10. Deploying Glassmorphism Notification System (Dunst)..."
+# Ensure dunst is installed
+if ! command -v dunst >/dev/null 2>&1; then
+    sudo emerge --ask=n --quiet x11-misc/dunst 2>/dev/null || true
+fi
+# Deploy Dunst config
+mkdir -p ~/.config/dunst
+if [ -f "$(dirname "$0")/dunstrc" ]; then
+    cp "$(dirname "$0")/dunstrc" ~/.config/dunst/dunstrc
+fi
+
+echo "11. Installing Office & PDF Suite (BTEC Ready)..."
+# A. Okular (Premium PDF with Signing/Annotations)
+if ! command -v okular >/dev/null 2>&1; then
+    echo "   → Installing Okular (PDF Reader)..."
+    sudo emerge --ask=n --quiet kde-apps/okular 2>/dev/null || true
+fi
+
+# B. OnlyOffice (Microsoft Office Alternative via Flatpak)
+if command -v flatpak >/dev/null 2>&1; then
+    echo "   → Installing OnlyOffice Desktop Editors..."
+    flatpak install --noninteractive flathub org.onlyoffice.desktopeditors 2>/dev/null || true
+fi
+
+# D. Dynamic Swap Management (Swapspace)
+if ! command -v swapspace >/dev/null 2>&1; then
+    echo "   → Installing Dynamic Swap Manager (Swapspace)..."
+    sudo emerge --ask=n --quiet sys-apps/swapspace 2>/dev/null || true
+fi
+if command -v swapspace >/dev/null 2>&1; then
+    echo "   → Enabling Dynamic Swap Service..."
+    # Ensure the config exists and points to /var/lib/swapspace
+    sudo mkdir -p /var/lib/swapspace
+    sudo rc-update add swapspace default 2>/dev/null || true
+    sudo rc-service swapspace start 2>/dev/null || true
+fi
 
 echo "EtherealOS Final Polish Complete!"

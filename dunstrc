@@ -1,0 +1,74 @@
+[global]
+    ### Display ###
+    monitor = 0
+    follow = mouse
+    width = 350
+    height = 500
+    origin = top-right
+    offset = 40x40
+    scale = 0
+    notification_limit = 0
+
+    ### Text ###
+    font = "Inter Semi-Bold 11"
+    line_height = 4
+    markup = full
+    format = "<b>%s</b>\n%b"
+    alignment = left
+    vertical_alignment = center
+    show_age_threshold = 60
+    ellipsize = middle
+    ignore_newline = no
+    stack_duplicates = true
+    hide_duplicate_count = false
+    show_indicators = yes
+
+    ### Icons ###
+    enable_recursive_icon_lookup = true
+    icon_position = left
+    min_icon_size = 32
+    max_icon_size = 64
+    icon_path = /usr/share/icons/Papirus/48x48/notifications:/usr/share/icons/Papirus-Dark/48x48/notifications
+
+    ### History ###
+    sticky_history = yes
+    history_length = 20
+
+    ### Misc/Advanced ###
+    dmenu = /usr/bin/rofi -dmenu -p dunst:
+    browser = /usr/bin/firefox
+    always_run_script = true
+    title = Dunst
+    class = Dunst
+    corner_radius = 18
+    ignore_dbusclose = false
+
+    ### Mouse ###
+    mouse_left_click = close_current
+    mouse_middle_click = do_action, close_current
+    mouse_right_click = close_all
+
+[experimental]
+    per_monitor_dpi = false
+
+[urgency_low]
+    # Glassmorphism: Semi-transparent dark background + vibrant accent
+    background = "#090A0FAA"
+    foreground = "#FFFFFF"
+    frame_color = "#2EB3FF"
+    timeout = 10
+    icon = "🪐"
+
+[urgency_normal]
+    background = "#090A0FAA"
+    foreground = "#FFFFFF"
+    frame_color = "#FF3250"
+    timeout = 10
+    icon = "🪐"
+
+[urgency_critical]
+    background = "#FF000088"
+    foreground = "#FFFFFF"
+    frame_color = "#FFFFFF"
+    timeout = 0
+    icon = "🪐"

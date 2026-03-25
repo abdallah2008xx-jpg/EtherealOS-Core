@@ -211,6 +211,10 @@ class GameMode(Gtk.Window):
             cmd = "echo performance | tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor; sync; echo 3 > /proc/sys/vm/drop_caches"
             self.add_log(f"Spawning pkexec layer...")
             
+            # Silence Notifications (DND)
+            self.add_log("DND ACTIVATED: Silencing all notifications...")
+            subprocess.run(["dunstctl", "set-paused", "true"], check=False)
+            
             def run_bg():
                 try:
                     subprocess.run(["pkexec", "bash", "-c", cmd], check=False)
@@ -228,6 +232,11 @@ class GameMode(Gtk.Window):
             self.st_gpu.set_text("Normal")
             self.st_net.set_text("Default")
             self.add_log("Reverting CPU governor to balanced...")
+            
+            # Restore Notifications
+            self.add_log("DND DEACTIVATED: Restoring notification stream...")
+            subprocess.run(["dunstctl", "set-paused", "false"], check=False)
+            
             def run_bg2():
                 try:
                     subprocess.run(["pkexec", "bash", "-c", "echo powersave | tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor"], check=False)

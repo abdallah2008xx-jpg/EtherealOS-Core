@@ -41,4 +41,12 @@ done
 echo "✨ Finishing touches (Icons & Cursors)..."
 bash Ethereal-Final-Polish.sh
 
+# 5. Deployment of Snapshot Tools
+echo "📸 Deploying Snapshot Tools..."
+sudo cp Ethereal-Snapshot.sh /usr/local/bin/
+sudo chmod +x /usr/local/bin/Ethereal-Snapshot.sh
+cp SystemSnapshot.desktop ~/Desktop/
+chmod +x ~/Desktop/SystemSnapshot.desktop
+gio set ~/Desktop/SystemSnapshot.desktop metadata::trusted true 2>/dev/null || true
+
 echo "✅ Deployment Successful! Welcome home."

@@ -2,7 +2,7 @@
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GLib
-import os, sys, threading, urllib.request, json, ssl, re, time, tempfile, shutil
+import os, sys, threading, urllib.request, json, ssl, re, time, tempfile, shutil, subprocess
 
 # --- DESIGN SYSTEM ---
 CSS = b"""
@@ -107,23 +107,20 @@ progressbar progress {
 
 # --- APP DATABASE ---
 APPS = [
-    {"id": "discord", "name": "Discord", "cat": "Internet", "desc": "Chat for Communities and Friends", "repo": "portapps/discord-portable", "icon": "discord"},
-    {"id": "spotify", "name": "Spotify", "cat": "Media", "desc": "Music Player and Podcasts", "repo": "srevinsaju/Spotify-AppImage", "icon": "spotify"},
-    {"id": "heroic", "name": "Heroic Games", "cat": "Games", "desc": "Epic, GOG & Amazon Games Launcher", "repo": "Heroic-Games-Launcher/HeroicGamesLauncher", "icon": "applications-games"},
-    {"id": "freetube", "name": "FreeTube", "cat": "Media", "desc": "Private YouTube Client (No Ads)", "repo": "FreeTubeApp/FreeTube", "icon": "youtube"},
-    {"id": "upscayl", "name": "Upscayl", "cat": "Media", "desc": "Free AI Image Upscaler", "repo": "upscayl/upscayl", "icon": "image-viewer"},
-    {"id": "localsend", "name": "LocalSend", "cat": "Internet", "desc": "AirDrop for Linux (Share Files)", "repo": "localsend/localsend", "icon": "folder-share"},
-    {"id": "audacity", "name": "Audacity", "cat": "Media", "desc": "Professional Audio Editor", "repo": "audacity/audacity", "icon": "audacity"},
-    {"id": "vscodium", "name": "VSCodium", "cat": "Productivity", "desc": "Free Open Source VS Code", "repo": "VSCodium/vscodium", "icon": "vscodium"},
-    {"id": "bitwarden", "name": "Bitwarden", "cat": "Internet", "desc": "Secure Password Manager", "repo": "bitwarden/clients", "icon": "bitwarden"},
-    {"id": "obsidian", "name": "Obsidian", "cat": "Productivity", "desc": "Personal Knowledge Base", "repo": "obsidianmd/obsidian-releases", "icon": "obsidian"},
-    {"id": "kdenlive", "name": "Kdenlive", "cat": "Media", "desc": "Pro Video Editor", "repo": "KDE/kdenlive", "icon": "kdenlive"},
-    {"id": "anydesk", "name": "AnyDesk", "cat": "Internet", "desc": "Remote Desktop Software", "repo": "srevinsaju/anydesk-appimage", "icon": "anydesk"},
-    {"id": "postman", "name": "Postman", "cat": "Productivity", "desc": "API Platform Toolkit", "repo": "srevinsaju/Postman-AppImage", "icon": "postman"},
-    {"id": "firefox", "name": "Firefox", "cat": "Internet", "desc": "Fast & Private Browser", "repo": "srevinsaju/Firefox-AppImage", "icon": "firefox"},
-    {"id": "thunderbird", "name": "Thunderbird", "cat": "Internet", "desc": "Email Client", "repo": "srevinsaju/Thunderbird-AppImage", "icon": "thunderbird"},
-    {"id": "gimp", "name": "GIMP", "cat": "Media", "desc": "Image Editor", "repo": "srevinsaju/gimp-appimage", "icon": "gimp"},
-    {"id": "libreoffice", "name": "LibreOffice", "cat": "Productivity", "desc": "Office Suite", "repo": "srevinsaju/LibreOffice-AppImage", "icon": "libreoffice"}
+    {"id": "discord", "name": "Discord", "cat": "Internet", "desc": "Chat for Communities and Friends", "repo": "portapps/discord-portable", "icon": "discord", "source": "appimage"},
+    {"id": "spotify", "name": "Spotify", "cat": "Media", "desc": "Music Player and Podcasts", "source": "flatpak", "pkg_id": "com.spotify.Client", "icon": "spotify"},
+    {"id": "vlc", "name": "VLC Media Player", "cat": "Media", "desc": "The best open source media player.", "source": "flatpak", "pkg_id": "org.videolan.VLC", "icon": "vlc"},
+    {"id": "steam", "name": "Steam", "cat": "Games", "desc": "Digital distribution for gaming.", "source": "flatpak", "pkg_id": "com.valvesoftware.Steam", "icon": "steam"},
+    {"id": "heroic", "name": "Heroic Games", "cat": "Games", "desc": "Epic, GOG & Amazon Games Launcher", "repo": "Heroic-Games-Launcher/HeroicGamesLauncher", "icon": "applications-games", "source": "appimage"},
+    {"id": "slack", "name": "Slack", "cat": "Productivity", "desc": "Team communication and collaboration.", "source": "snap", "pkg_id": "slack", "icon": "slack"},
+    {"id": "freetube", "name": "FreeTube", "cat": "Media", "desc": "Private YouTube Client (No Ads)", "repo": "FreeTubeApp/FreeTube", "icon": "youtube", "source": "appimage"},
+    {"id": "vscodium", "name": "VSCodium", "cat": "Productivity", "desc": "Free Open Source VS Code", "repo": "VSCodium/vscodium", "icon": "vscodium", "source": "appimage"},
+    {"id": "obsidian", "name": "Obsidian", "cat": "Productivity", "desc": "Personal Knowledge Base", "repo": "obsidianmd/obsidian-releases", "icon": "obsidian", "source": "appimage"},
+    {"id": "obs-studio", "name": "OBS Studio", "cat": "Media", "desc": "Live streaming and recording software.", "source": "flatpak", "pkg_id": "com.obsproject.Studio", "icon": "obs-studio"},
+    {"id": "telegram", "name": "Telegram Desktop", "cat": "Internet", "desc": "Fast and secure messaging.", "source": "flatpak", "pkg_id": "org.telegram.desktop", "icon": "telegram"},
+    {"id": "firefox", "name": "Firefox", "cat": "Internet", "desc": "Fast & Private Browser", "repo": "srevinsaju/Firefox-AppImage", "icon": "firefox", "source": "appimage"},
+    {"id": "gimp", "name": "GIMP", "cat": "Media", "desc": "Image Editor", "repo": "srevinsaju/gimp-appimage", "icon": "gimp", "source": "appimage"},
+    {"id": "libreoffice", "name": "LibreOffice", "cat": "Productivity", "desc": "Office Suite", "repo": "srevinsaju/LibreOffice-AppImage", "icon": "libreoffice", "source": "appimage"}
 ]
 
 class EtherealStore(Gtk.Window):
@@ -245,7 +242,7 @@ class EtherealStore(Gtk.Window):
         desc_label.set_line_wrap(True)
         desc_label.set_max_width_chars(60)
 
-        meta_label = Gtk.Label(label=f"Category: {app['cat']} | Source: GitHub", xalign=0)
+        meta_label = Gtk.Label(label=f"Category: {app['cat']} | Source: {app['source'].upper()}", xalign=0)
         meta_label.get_style_context().add_class("app-meta")
 
         # Progress elements
@@ -322,7 +319,31 @@ class EtherealStore(Gtk.Window):
 
     def installer_thread(self, app):
         try:
-            # Setup context
+            source = app.get("source", "appimage")
+            
+            if source == "flatpak":
+                pkg_id = app["pkg_id"]
+                GLib.idle_add(app["status_widget"].set_text, f"Installing {pkg_id} via Flatpak...")
+                GLib.idle_add(app["pbar_widget"].set_fraction, 0.5)
+                # Run flatpak install
+                res = subprocess.run(["flatpak", "install", "-y", "flathub", pkg_id], capture_output=True, text=True)
+                if res.returncode != 0:
+                    raise Exception(f"Flatpak error: {res.stderr}")
+                GLib.idle_add(self.on_install_success, app)
+                return
+
+            if source == "snap":
+                pkg_id = app["pkg_id"]
+                GLib.idle_add(app["status_widget"].set_text, f"Installing {pkg_id} via Snap...")
+                GLib.idle_add(app["pbar_widget"].set_fraction, 0.5)
+                # Run snap install
+                res = subprocess.run(["sudo", "snap", "install", pkg_id], capture_output=True, text=True)
+                if res.returncode != 0:
+                    raise Exception(f"Snap error: {res.stderr}")
+                GLib.idle_add(self.on_install_success, app)
+                return
+
+            # Default AppImage logic
             ctx = ssl.create_default_context()
             ctx.check_hostname = False
             ctx.verify_mode = ssl.CERT_NONE
