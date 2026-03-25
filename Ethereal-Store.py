@@ -45,7 +45,6 @@ list row.app-row:hover { background: rgba(255,255,255,0.02); }
 .app-card { padding: 25px 30px; }
 
 .app-icon { font-size: 48px; margin-right: 25px; }
-.app-icon-image { icon-size: 48px; margin-right: 25px; }
 
 .app-name { color: #f0f0fd; font-size: 24px; font-weight: 800; text-shadow: 0 0 10px rgba(126,215,255,0.2); }
 .app-desc { color: #8892b0; font-size: 15px; margin-top: 6px; font-weight: 500; }
