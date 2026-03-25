@@ -36,6 +36,7 @@ cp Ethereal-Notifier-Autostart.desktop "$HOME/.config/autostart/" 2>/dev/null
 # ═══════════════════════════════════════════
 # STEP 2: Update & Deploy (inside zenity for UI)
 # ═══════════════════════════════════════════
+(
 echo "5"; echo "# 📶 Checking Internet Connection..."
 if ! ping -c 1 8.8.8.8 >/dev/null 2>&1; then
     echo "Error: No internet connection. Update aborted." >&2
