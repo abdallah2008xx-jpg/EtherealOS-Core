@@ -36,10 +36,19 @@ cp Ethereal-Notifier-Autostart.desktop "$HOME/.config/autostart/" 2>/dev/null
 # ═══════════════════════════════════════════
 # STEP 2: Update & Deploy (inside zenity for UI)
 # ═══════════════════════════════════════════
-(
 echo "5"; echo "# 📶 Checking Internet Connection..."
 if ! ping -c 1 8.8.8.8 >/dev/null 2>&1; then
     echo "Error: No internet connection. Update aborted." >&2
+    exit 1
+fi
+
+echo "7"; echo "# ⚙️ Verifying System Environment..."
+if [ "$(id -u)" -eq 0 ]; then
+    echo "Error: Please do not run this as root directly. Use regular user." >&2
+    exit 1
+fi
+if ! command -v git >/dev/null 2>&1; then
+    echo "Error: Git is missing. Essential for updates." >&2
     exit 1
 fi
 

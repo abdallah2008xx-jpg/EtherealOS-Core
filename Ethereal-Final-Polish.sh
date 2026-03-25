@@ -14,6 +14,20 @@ echo "2. Applying the Window Borders & GTK UI..."
 gsettings set org.cinnamon.desktop.wm.preferences theme 'WhiteSur-Dark'
 gsettings set org.cinnamon.desktop.interface gtk-theme 'WhiteSur-Dark'
 
+echo "3. Installing Official EtherealOS Premium Icon Engine (Papirus)..."
+mkdir -p ~/.icons
+# Securely download and install Papirus directly into user's .icons folder
+wget -qO- https://raw.githubusercontent.com/PapirusDevelopmentTeam/papirus-icon-theme/master/install.sh | DESTDIR="$HOME/.icons" sh 2>/dev/null || true
+gsettings set org.cinnamon.desktop.interface icon-theme 'Papirus-Dark'
+
+echo "4. Configuring Ultra-Premium Navigation Animations..."
+# Enable 3D Coverflow for Alt-Tab Window Navigation! (Like macOS / Compiz)
+gsettings set org.cinnamon alttab-switcher-style 'coverflow'
+# Enable Expo/Scale animations for workspaces
+gsettings set org.cinnamon desktop-effects-workspace 'scale'
+gsettings set org.cinnamon.muffin wobbly-windows true
+gsettings set org.cinnamon.muffin desktop-effects true
+
 echo "3. Installing Premium Mouse Cursor (Capitaine/Mac Style)..."
 mkdir -p ~/.icons
 if [ ! -d ~/.icons/capitaine-cursors ]; then
