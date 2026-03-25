@@ -471,15 +471,56 @@ Keywords=Ethereal;App;
         app["btn_widget"].set_sensitive(True)
 
 if __name__ == "__main__":
-    style_provider = Gtk.CssProvider()
-    style_provider.load_from_data(CSS)
-    Gtk.StyleContext.add_provider_for_screen(
-        Gdk.Screen.get_default(),
-        style_provider,
-        Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
-    )
+    try:
+        style_provider = Gtk.CssProvider()
+        style_provider.load_from_data(CSS)
+        Gtk.StyleContext.add_provider_for_screen(
+            Gdk.Screen.get_default(),
+            style_provider,
+            Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+        )
 
-    win = EtherealStore()
-    win.connect("destroy", Gtk.main_quit)
-    win.show_all()
-    Gtk.main()
+        win = EtherealStore()
+        win.connect("destroy", Gtk.main_quit)
+        win.show_all()
+        Gtk.main()
+    except Exception as e:
+        import traceback
+        err_msg = traceback.format_exc()
+        try:
+            # Try to show a Gtk error window
+            err_win = Gtk.Window(title="Ethereal Store Crash Reporter")
+            err_win.set_default_size(600, 400)
+            err_win.set_position(Gtk.WindowPosition.CENTER)
+            
+            vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+            vbox.set_markup = True
+            vbox.set_margin_start(20); vbox.set_margin_end(20); vbox.set_margin_top(20); vbox.set_margin_bottom(20)
+            err_win.add(vbox)
+            
+            lbl = Gtk.Label(label="<b>The App Store encountered a fatal error:</b>", use_markup=True)
+            vbox.pack_start(lbl, False, False, 0)
+            
+            scroll = Gtk.ScrolledWindow()
+            scroll.set_shadow_type(Gtk.ShadowType.IN)
+            vbox.pack_start(scroll, True, True, 0)
+            
+            text_view = Gtk.TextView()
+            text_view.set_editable(False)
+            text_view.get_buffer().set_text(err_msg)
+            scroll.add(text_view)
+            
+            close_btn = Gtk.Button(label="Close")
+            close_btn.connect("clicked", Gtk.main_quit)
+            vbox.pack_start(close_btn, False, False, 0)
+            
+            err_win.show_all()
+            err_win.connect("destroy", Gtk.main_quit)
+            Gtk.main()
+        except:
+            # Fallback to Zenity if Gtk fails
+            try:
+                import subprocess
+                subprocess.run(["zenity", "--error", "--title=App Store Error", "--text=Failed to open App Store.\n\n" + str(e), "--width=300"])
+            except:
+                pass
