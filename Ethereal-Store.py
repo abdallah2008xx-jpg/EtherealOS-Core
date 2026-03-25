@@ -44,7 +44,8 @@ list row.app-row:hover { background: rgba(255,255,255,0.02); }
 
 .app-card { padding: 25px 30px; }
 
-.app-emoji { font-size: 48px; margin-right: 25px; }
+.app-icon { font-size: 48px; margin-right: 25px; }
+.app-icon-image { icon-size: 48px; margin-right: 25px; }
 
 .app-name { color: #f0f0fd; font-size: 24px; font-weight: 800; text-shadow: 0 0 10px rgba(126,215,255,0.2); }
 .app-desc { color: #8892b0; font-size: 15px; margin-top: 6px; font-weight: 500; }
@@ -66,21 +67,21 @@ progressbar progress { background-color: #00ff88; border-radius: 10px; box-shado
 """
 
 APPS = [
-    {"id": "discord", "name": "Discord", "cat": "Internet", "desc": "Chat for Communities and Friends", "repo": "srevinsaju/Discord-AppImage", "emoji": "💬"},
-    {"id": "spotify", "name": "Spotify", "cat": "Media", "desc": "Music Player and Podcasts", "repo": "srevinsaju/Spotify-AppImage", "emoji": "🎧"},
-    {"id": "heroic", "name": "Heroic Games", "cat": "Games", "desc": "Epic, GOG & Amazon Games Launcher", "repo": "Heroic-Games-Launcher/HeroicGamesLauncher", "emoji": "🕹️"},
-    {"id": "freetube", "name": "FreeTube", "cat": "Media", "desc": "Private YouTube Client (No Ads)", "repo": "FreeTubeApp/FreeTube", "emoji": "📺"},
-    {"id": "upscayl", "name": "Upscayl", "cat": "Media", "desc": "Free AI Image Upscaler", "repo": "upscayl/upscayl", "emoji": "🖼️"},
-    {"id": "localsend", "name": "LocalSend", "cat": "Internet", "desc": "AirDrop for Linux (Share Files)", "repo": "localsend/localsend", "emoji": "📤"},
-    {"id": "rpcs3", "name": "RPCS3 Emulator", "cat": "Games", "desc": "PlayStation 3 Emulator", "repo": "RPCS3/rpcs3-binaries-linux", "emoji": "👾"},
-    {"id": "audacity", "name": "Audacity", "cat": "Media", "desc": "Professional Audio Editor", "repo": "audacity/audacity", "emoji": "🎙️"},
-    {"id": "floorp", "name": "FloorP Browser", "cat": "Internet", "desc": "Most Private Firefox Fork", "repo": "Floorp-Projects/Floorp", "emoji": "🦊"},
-    {"id": "vscodium", "name": "VSCodium", "cat": "Productivity", "desc": "Free Open Source VS Code", "repo": "VSCodium/vscodium", "emoji": "💻"},
-    {"id": "bitwarden", "name": "Bitwarden", "cat": "Internet", "desc": "Secure Password Manager", "repo": "bitwarden/clients", "emoji": "🔒"},
-    {"id": "obsidian", "name": "Obsidian", "cat": "Productivity", "desc": "Personal Knowledge Base", "repo": "obsidianmd/obsidian-releases", "emoji": "📓"},
-    {"id": "kdenlive", "name": "Kdenlive", "cat": "Media", "desc": "Pro Video Editor", "repo": "KDE/kdenlive", "emoji": "🎬"},
-    {"id": "anydesk", "name": "AnyDesk", "cat": "Internet", "desc": "Remote Desktop Software", "repo": "srevinsaju/anydesk-appimage", "emoji": "🖥️"},
-    {"id": "postman", "name": "Postman", "cat": "Productivity", "desc": "API Platform Toolkit", "repo": "srevinsaju/Postman-AppImage", "emoji": "🚀"}
+    {"id": "discord", "name": "Discord", "cat": "Internet", "desc": "Chat for Communities and Friends", "repo": "srevinsaju/Discord-AppImage", "icon": "discord"},
+    {"id": "spotify", "name": "Spotify", "cat": "Media", "desc": "Music Player and Podcasts", "repo": "srevinsaju/Spotify-AppImage", "icon": "spotify"},
+    {"id": "heroic", "name": "Heroic Games", "cat": "Games", "desc": "Epic, GOG & Amazon Games Launcher", "repo": "Heroic-Games-Launcher/HeroicGamesLauncher", "icon": "applications-games"},
+    {"id": "freetube", "name": "FreeTube", "cat": "Media", "desc": "Private YouTube Client (No Ads)", "repo": "FreeTubeApp/FreeTube", "icon": "youtube"},
+    {"id": "upscayl", "name": "Upscayl", "cat": "Media", "desc": "Free AI Image Upscaler", "repo": "upscayl/upscayl", "icon": "image-viewer"},
+    {"id": "localsend", "name": "LocalSend", "cat": "Internet", "desc": "AirDrop for Linux (Share Files)", "repo": "localsend/localsend", "icon": "folder-share"},
+    {"id": "rpcs3", "name": "RPCS3 Emulator", "cat": "Games", "desc": "PlayStation 3 Emulator", "repo": "RPCS3/rpcs3-binaries-linux", "icon": "wine"},
+    {"id": "audacity", "name": "Audacity", "cat": "Media", "desc": "Professional Audio Editor", "repo": "audacity/audacity", "icon": "audacity"},
+    {"id": "floorp", "name": "FloorP Browser", "cat": "Internet", "desc": "Most Private Firefox Fork", "repo": "Floorp-Projects/Floorp", "icon": "floorp"},
+    {"id": "vscodium", "name": "VSCodium", "cat": "Productivity", "desc": "Free Open Source VS Code", "repo": "VSCodium/vscodium", "icon": "vscodium"},
+    {"id": "bitwarden", "name": "Bitwarden", "cat": "Internet", "desc": "Secure Password Manager", "repo": "bitwarden/clients", "icon": "bitwarden"},
+    {"id": "obsidian", "name": "Obsidian", "cat": "Productivity", "desc": "Personal Knowledge Base", "repo": "obsidianmd/obsidian-releases", "icon": "obsidian"},
+    {"id": "kdenlive", "name": "Kdenlive", "cat": "Media", "desc": "Pro Video Editor", "repo": "KDE/kdenlive", "icon": "kdenlive"},
+    {"id": "anydesk", "name": "AnyDesk", "cat": "Internet", "desc": "Remote Desktop Software", "repo": "srevinsaju/anydesk-appimage", "icon": "anydesk"},
+    {"id": "postman", "name": "Postman", "cat": "Productivity", "desc": "API Platform Toolkit", "repo": "srevinsaju/Postman-AppImage", "icon": "postman"}
 ]
 
 class AppStore(Gtk.Window):
@@ -139,7 +140,11 @@ class AppStore(Gtk.Window):
         
         card = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL); card.set_name("app-card")
         
-        icon = Gtk.Label(label=app["emoji"]); icon.set_name("app-emoji")
+        # Use icon from theme with fallback
+        icon_name = app.get("icon", "application-x-executable")
+        icon = Gtk.Image.new_from_icon_name(icon_name, Gtk.IconSize.DIALOG)
+        icon.set_pixel_size(48)
+        icon.set_name("app-icon-image")
         card.pack_start(icon, False, False, 0)
         
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL); vbox.set_valign(Gtk.Align.CENTER)
@@ -234,8 +239,9 @@ class AppStore(Gtk.Window):
             urllib.request.urlretrieve(dl_url, out_path, reporthook=report)
             os.chmod(out_path, 0o755)
             
-            # Desktop File Magic
-            d_cont = f"[Desktop Entry]\nName={app['name']}\nComment={app['desc']}\nExec=\"{out_path}\"\nTerminal=false\nType=Application\nCategories={app['cat']};Utility;\n"
+            # Desktop File Magic with icon
+            icon_name = app.get("icon", "application-x-executable")
+            d_cont = f"[Desktop Entry]\nName={app['name']}\nComment={app['desc']}\nExec=\"{out_path}\"\nIcon={icon_name}\nTerminal=false\nType=Application\nCategories={app['cat']};Utility;\n"
             dfile = os.path.join(self.shortcut_dir, f"ethereal_{app['id']}.desktop")
             with open(dfile, 'w') as f: f.write(d_cont)
             os.chmod(dfile, 0o755)
