@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=🔧 Task Manager
+Comment=Monitor system processes and resources
+Exec=bash -c "cd ~/ethereal-update && python3 Ethereal-TaskMgr.py"
+Icon=utilities-system-monitor
+Terminal=false
+Type=Application
+Categories=System;Monitor;

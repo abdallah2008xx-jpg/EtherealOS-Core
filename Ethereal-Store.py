@@ -65,9 +65,8 @@ list row.app-row {
     transition: all 0.3s;
 }
 list row.app-row:hover { 
-    background: rgba(255, 255, 255, 0.06);
-    transform: translateY(-2px);
-    border-color: rgba(126, 215, 255, 0.3);
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(126, 215, 255, 0.4);
 }
 
 .app-card { padding: 20px 25px; }
@@ -80,7 +79,7 @@ list row.app-row:hover {
     border-radius: 14px; padding: 10px 30px; border: none;
     transition: all 0.3s;
 }
-.install-btn:hover { background: #00e077; transform: scale(1.05); box-shadow: 0 0 25px rgba(0,255,136,0.3); }
+.install-btn:hover { background: #00ff99; box-shadow: 0 0 25px rgba(0,255,136,0.3); }
 .install-btn:disabled { background: rgba(255,255,255,0.1); color: #718096; }
 
 .installed-btn {
