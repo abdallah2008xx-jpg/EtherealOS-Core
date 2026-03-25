@@ -1,8 +1,8 @@
 [Desktop Entry]
-Name=🛍️ Ethereal Store
-Comment=One-click installer for EtherealOS
+Name=🛍️ App Store
+Comment=Install apps with one click
 Exec=/usr/bin/python3 /home/abdallah/ethereal-update/Ethereal-Store.py
-Icon=/home/abdallah/.local/share/icons/ethereal/ethereal-store.svg
+Icon=gnome-software
 Terminal=false
 Type=Application
 Categories=System;Utility;

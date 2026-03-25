@@ -15,8 +15,12 @@ mkdir -p ~/.local/share/icons/ethereal
 echo "🎨 Installing App Icons..."
 cp icons/*.svg ~/.local/share/icons/ethereal/ 2>/dev/null
 
+# Install modern icon themes (Windows 11 style)
+echo "📦 Installing Modern Icon Themes..."
+bash install-modern-icons.sh 2>/dev/null || echo "⚠️ Modern icons skipped (offline)"
+
 # Install Papirus icon theme (complete icon pack)
-echo "📦 Installing Papirus Icon Theme (complete pack)..."
+echo "📦 Installing Papirus Icon Theme..."
 bash install-papirus-icons.sh 2>/dev/null || echo "⚠️ Papirus install skipped (offline)"
 
 # Enable Background Updater 
