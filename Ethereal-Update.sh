@@ -88,13 +88,22 @@ sudo cp "$REPO_DIR"/*.py /usr/local/bin/ 2>/dev/null
 sudo chmod +x /usr/local/bin/Ethereal-* 2>/dev/null
 sudo chmod +x /usr/local/bin/*.py 2>/dev/null
 
-echo "45"; echo "# 🧹 Cleaning old Ethereal launchers..."
-# Remove only Ethereal-specific icons to be less aggressive
-# find "$HOME/Desktop" -name "*.desktop" -exec grep -q "Ethereal" {} \; -delete 2>/dev/null
-# Using a safer approach: remove icons we are about to re-deploy
-for d in "$REPO_DIR"/*.desktop; do
-    bn=$(basename "$d")
-    [ "$bn" != "*-Autostart.desktop" ] && rm -f "$HOME/Desktop/$bn" 2>/dev/null
+echo "45"; echo "# 🧹 Deep Cleaning Desktop Launchers..."
+# Identify and remove OLD or duplicated Ethereal launchers
+# This targets files by keyword and by checking internal 'Ethereal' markers
+for file in "$HOME/Desktop"/*.desktop; do
+    if [ -f "$file" ]; then
+        # Remove if filename contains Ethereal/Boost/Store/Snapshot/Update
+        case "$(basename "$file")" in
+            *Ethereal*|*Boost*|*Store*|*Snapshot*|*Update*|*GameMode*|*Repair*|*Optimizer*|*Hardware*)
+                rm -f "$file" 2>/dev/null
+                ;;
+        esac
+        # OR if the file content HAS "Ethereal" in the name field
+        if grep -q "Name=.*\(Ethereal\|Boost\|Store\)" "$file" 2>/dev/null; then
+            rm -f "$file" 2>/dev/null
+        fi
+    fi
 done
 
 echo "55"; echo "# 📂 Deploying Desktop Icons..."
