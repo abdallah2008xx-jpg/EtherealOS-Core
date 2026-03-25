@@ -2,19 +2,19 @@
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GLib
-import os, threading, urllib.request, shutil
+import os, sys, threading, urllib.request, shutil
 
 CSS = b"""
 window { background-color: transparent; }
 #main-bg {
     background-color: rgba(12, 14, 25, 0.98);
     border-radius: 20px;
-    border: 1px solid rgba(126, 215, 255, 0.2);
-    box-shadow: 0 15px 60px rgba(0,0,0,0.9);
+    border: 1px solid rgba(126, 215, 255, 0.3);
+    box-shadow: 0 15px 80px rgba(0,0,0,0.9);
 }
 
 .sidebar {
-    background-color: rgba(0, 0, 0, 0.4);
+    background-color: rgba(0, 0, 0, 0.5);
     border-right: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 20px 0 0 20px;
     padding: 20px 10px;
@@ -22,8 +22,8 @@ window { background-color: transparent; }
 
 list row.tab-row {
     background: transparent; color: #8892b0;
-    padding: 14px 20px; margin: 4px 10px;
-    border-radius: 12px; font-weight: bold; font-size: 14px;
+    padding: 16px 20px; margin: 4px 10px;
+    border-radius: 12px; font-weight: bold; font-size: 15px;
     transition: all 250ms ease;
 }
 list row.tab-row:hover { background: rgba(255, 255, 255, 0.05); color: #ffffff; }
@@ -32,53 +32,61 @@ list row.tab-row:selected {
     color: #7ed7ff; border-left: 4px solid #7ed7ff;
 }
 
-.search-bar { background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 10px; font-size: 15px; margin: 10px 30px; }
-.search-bar:focus { border: 1px solid #7ed7ff; box-shadow: 0 0 10px rgba(126,215,255,0.3); }
-
-.app-card {
-    background-color: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 16px; padding: 20px; margin: 15px;
+.search-bar { 
+    background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.1); 
+    border-radius: 12px; padding: 12px; font-size: 16px; margin: 15px 30px; 
 }
-.app-card:hover {
-    background-color: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(126, 215, 255, 0.3);
-    box-shadow: 0 0 30px rgba(126, 215, 255, 0.15);
-}
+.search-bar:focus { border: 1px solid #7ed7ff; box-shadow: 0 0 15px rgba(126,215,255,0.3); }
 
-.app-name { color: #ffffff; font-size: 20px; font-weight: bold; }
-.app-desc { color: #a3b2fa; font-size: 13px; margin-top: 5px; }
+list.app-list { background: transparent; }
+list row.app-row { background: transparent; transition: all 200ms; border-bottom: 1px solid rgba(255,255,255,0.02); }
+list row.app-row:hover { background: rgba(255,255,255,0.02); }
+
+.app-card { padding: 25px 30px; }
+
+.app-emoji { font-size: 48px; margin-right: 25px; }
+
+.app-name { color: #f0f0fd; font-size: 24px; font-weight: 800; text-shadow: 0 0 10px rgba(126,215,255,0.2); }
+.app-desc { color: #8892b0; font-size: 15px; margin-top: 6px; font-weight: 500; }
 
 .install-btn {
-    background: transparent; color: #00ff88; font-weight: bold; border-radius: 10px;
-    border: 2px solid rgba(0,255,136, 0.4); padding: 8px 24px; transition: all 250ms;
+    background: transparent; color: #00ff88; font-weight: bold; border-radius: 12px; font-size: 16px;
+    border: 2px solid rgba(0,255,136, 0.5); padding: 10px 35px; transition: all 250ms;
 }
-.install-btn:hover { background: rgba(0,255,136, 0.1); box-shadow: 0 0 15px rgba(0,255,136, 0.3); }
-.installed-btn { background: rgba(255,255,255,0.05); color: #8892b0; font-weight: bold; border-radius: 10px; border: 2px solid rgba(255,255,255, 0.1); padding: 8px 24px; }
+.install-btn:hover { background: rgba(0,255,136, 0.15); box-shadow: 0 0 20px rgba(0,255,136, 0.4); }
+
+.installed-btn {
+    background: rgba(255,255,255,0.05); color: #8892b0; font-weight: bold; border-radius: 12px; font-size: 16px;
+    border: 2px solid rgba(255,255,255, 0.1); padding: 10px 35px;
+}
+
+progressbar { border-radius: 10px; font-size: 10px; min-height: 8px; margin-top: 15px; }
+progressbar trough { background-color: rgba(0,0,0, 0.5); border-radius: 10px; }
+progressbar progress { background-color: #00ff88; border-radius: 10px; box-shadow: 0 0 15px rgba(0,255,136,0.8); }
 """
 
 APPS = [
-    {"id": "discord", "name": "Discord", "cat": "Internet", "desc": "Chat for Communities and Friends", "repo": "srevinsaju/Discord-AppImage", "icon": "discord"},
-    {"id": "spotify", "name": "Spotify", "cat": "Media", "desc": "Music Player and Podcasts", "repo": "srevinsaju/Spotify-AppImage", "icon": "spotify"},
-    {"id": "heroic", "name": "Heroic Games", "cat": "Games", "desc": "Epic, GOG & Amazon Games Launcher", "repo": "Heroic-Games-Launcher/HeroicGamesLauncher", "icon": "applications-games"},
-    {"id": "freetube", "name": "FreeTube", "cat": "Media", "desc": "Private YouTube Client (No Ads)", "repo": "FreeTubeApp/FreeTube", "icon": "youtube"},
-    {"id": "upscayl", "name": "Upscayl", "cat": "Media", "desc": "Free AI Image Upscaler", "repo": "upscayl/upscayl", "icon": "applications-graphics"},
-    {"id": "localsend", "name": "LocalSend", "cat": "Internet", "desc": "AirDrop for Linux (Share Files)", "repo": "localsend/localsend", "icon": "network-workgroup"},
-    {"id": "rpcs3", "name": "RPCS3 Emulator", "cat": "Games", "desc": "PlayStation 3 Emulator", "repo": "RPCS3/rpcs3-binaries-linux", "icon": "applications-games"},
-    {"id": "audacity", "name": "Audacity", "cat": "Media", "desc": "Professional Audio Editor", "repo": "audacity/audacity", "icon": "applications-multimedia"},
-    {"id": "floorp", "name": "FloorP Browser", "cat": "Internet", "desc": "Most Private Firefox Fork", "repo": "Floorp-Projects/Floorp", "icon": "web-browser"},
-    {"id": "vscodium", "name": "VSCodium", "cat": "Productivity", "desc": "Free Open Source VS Code", "repo": "VSCodium/vscodium", "icon": "text-editor"},
-    {"id": "bitwarden", "name": "Bitwarden", "cat": "Internet", "desc": "Secure Password Manager", "repo": "bitwarden/clients", "icon": "dialog-password"},
-    {"id": "obsidian", "name": "Obsidian", "cat": "Productivity", "desc": "Personal Knowledge Base", "repo": "obsidianmd/obsidian-releases", "icon": "accessories-text-editor"},
-    {"id": "kdenlive", "name": "Kdenlive", "cat": "Media", "desc": "Pro Video Editor", "repo": "KDE/kdenlive", "icon": "applications-multimedia"},
-    {"id": "anydesk", "name": "AnyDesk", "cat": "Internet", "desc": "Remote Desktop Software", "repo": "srevinsaju/anydesk-appimage", "icon": "preferences-desktop-remote"},
-    {"id": "postman", "name": "Postman", "cat": "Productivity", "desc": "API Platform Toolkit", "repo": "srevinsaju/Postman-AppImage", "icon": "applications-development"}
+    {"id": "discord", "name": "Discord", "cat": "Internet", "desc": "Chat for Communities and Friends", "repo": "srevinsaju/Discord-AppImage", "emoji": "💬"},
+    {"id": "spotify", "name": "Spotify", "cat": "Media", "desc": "Music Player and Podcasts", "repo": "srevinsaju/Spotify-AppImage", "emoji": "🎧"},
+    {"id": "heroic", "name": "Heroic Games", "cat": "Games", "desc": "Epic, GOG & Amazon Games Launcher", "repo": "Heroic-Games-Launcher/HeroicGamesLauncher", "emoji": "🕹️"},
+    {"id": "freetube", "name": "FreeTube", "cat": "Media", "desc": "Private YouTube Client (No Ads)", "repo": "FreeTubeApp/FreeTube", "emoji": "📺"},
+    {"id": "upscayl", "name": "Upscayl", "cat": "Media", "desc": "Free AI Image Upscaler", "repo": "upscayl/upscayl", "emoji": "🖼️"},
+    {"id": "localsend", "name": "LocalSend", "cat": "Internet", "desc": "AirDrop for Linux (Share Files)", "repo": "localsend/localsend", "emoji": "📤"},
+    {"id": "rpcs3", "name": "RPCS3 Emulator", "cat": "Games", "desc": "PlayStation 3 Emulator", "repo": "RPCS3/rpcs3-binaries-linux", "emoji": "👾"},
+    {"id": "audacity", "name": "Audacity", "cat": "Media", "desc": "Professional Audio Editor", "repo": "audacity/audacity", "emoji": "🎙️"},
+    {"id": "floorp", "name": "FloorP Browser", "cat": "Internet", "desc": "Most Private Firefox Fork", "repo": "Floorp-Projects/Floorp", "emoji": "🦊"},
+    {"id": "vscodium", "name": "VSCodium", "cat": "Productivity", "desc": "Free Open Source VS Code", "repo": "VSCodium/vscodium", "emoji": "💻"},
+    {"id": "bitwarden", "name": "Bitwarden", "cat": "Internet", "desc": "Secure Password Manager", "repo": "bitwarden/clients", "emoji": "🔒"},
+    {"id": "obsidian", "name": "Obsidian", "cat": "Productivity", "desc": "Personal Knowledge Base", "repo": "obsidianmd/obsidian-releases", "emoji": "📓"},
+    {"id": "kdenlive", "name": "Kdenlive", "cat": "Media", "desc": "Pro Video Editor", "repo": "KDE/kdenlive", "emoji": "🎬"},
+    {"id": "anydesk", "name": "AnyDesk", "cat": "Internet", "desc": "Remote Desktop Software", "repo": "srevinsaju/anydesk-appimage", "emoji": "🖥️"},
+    {"id": "postman", "name": "Postman", "cat": "Productivity", "desc": "API Platform Toolkit", "repo": "srevinsaju/Postman-AppImage", "emoji": "🚀"}
 ]
 
 class AppStore(Gtk.Window):
     def __init__(self):
         super().__init__(title="Ethereal Software Center")
-        self.set_default_size(1150, 780)
+        self.set_default_size(1200, 800)
         self.set_position(Gtk.WindowPosition.CENTER)
         self.set_app_paintable(True)
         if self.get_screen().get_rgba_visual() and self.get_screen().is_composited():
@@ -94,7 +102,7 @@ class AppStore(Gtk.Window):
         os.makedirs(self.shortcut_dir, exist_ok=True)
         
         # Sidebar
-        self.sidebar = Gtk.ListBox(); self.sidebar.set_name("sidebar"); self.sidebar.set_size_request(240, -1)
+        self.sidebar = Gtk.ListBox(); self.sidebar.set_name("sidebar"); self.sidebar.set_size_request(280, -1)
         self.sidebar.connect("row-activated", self.on_cat_changed)
         main_box.pack_start(self.sidebar, False, False, 0)
         
@@ -105,9 +113,11 @@ class AppStore(Gtk.Window):
         
         # Main Area
         right_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        right_vbox.set_margin_bottom(20)
         main_box.pack_start(right_vbox, True, True, 0)
         
-        self.search = Gtk.SearchEntry(placeholder_text="Search Ethereal Store..."); self.search.set_name("search-bar")
+        # Header Box
+        self.search = Gtk.SearchEntry(placeholder_text="Search Professional Apps..."); self.search.set_name("search-bar")
         self.search.connect("search-changed", self.on_search)
         right_vbox.pack_start(self.search, False, False, 10)
         
@@ -115,13 +125,9 @@ class AppStore(Gtk.Window):
         scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
         right_vbox.pack_start(scroll, True, True, 0)
         
-        self.flow = Gtk.FlowBox(); self.flow.set_valign(Gtk.Align.START)
-        self.flow.set_max_children_per_line(2); self.flow.set_min_children_per_line(1)
-        self.flow.set_selection_mode(Gtk.SelectionMode.NONE)
-        
-        align_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        align_box.pack_start(self.flow, True, True, 20)
-        scroll.add(align_box)
+        self.listbox = Gtk.ListBox(); self.listbox.set_name("app-list")
+        self.listbox.set_selection_mode(Gtk.SelectionMode.NONE)
+        scroll.add(self.listbox)
         
         self.cards = []
         for app in APPS: self.build_card(app)
@@ -129,24 +135,23 @@ class AppStore(Gtk.Window):
         self.sidebar.select_row(self.sidebar.get_row_at_index(0))
 
     def build_card(self, app):
-        card = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL); card.set_name("app-card")
-        card.set_size_request(420, 120)
+        row = Gtk.ListBoxRow(); row.set_name("app-row")
         
-        icon = Gtk.Image.new_from_icon_name(app["icon"], Gtk.IconSize.DIALOG)
-        if not icon.get_pixbuf(): icon = Gtk.Image.new_from_icon_name("application-x-executable", Gtk.IconSize.DIALOG)
-        icon.set_pixel_size(64); icon.set_margin_right(20)
+        card = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL); card.set_name("app-card")
+        
+        icon = Gtk.Label(label=app["emoji"]); icon.set_name("app-emoji")
         card.pack_start(icon, False, False, 0)
         
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL); vbox.set_valign(Gtk.Align.CENTER)
         name = Gtk.Label(label=app["name"], xalign=0); name.set_name("app-name")
         desc = Gtk.Label(label=app["desc"], xalign=0); desc.set_name("app-desc")
         
-        self.pbar = Gtk.ProgressBar(); self.pbar.set_visible(False); self.pbar.set_margin_top(15)
+        self.pbar = Gtk.ProgressBar(); self.pbar.set_visible(False)
         app["pbar"] = self.pbar
         
         vbox.pack_start(name, False, False, 0)
         vbox.pack_start(desc, False, False, 0)
-        vbox.pack_start(self.pbar, False, False, 0)
+        vbox.pack_start(self.pbar, False, False, 5)
         card.pack_start(vbox, True, True, 0)
         
         btn = Gtk.Button()
@@ -157,11 +162,12 @@ class AppStore(Gtk.Window):
         
         btn.set_valign(Gtk.Align.CENTER)
         app["btn"] = btn
-        card.pack_end(btn, False, False, 10)
+        card.pack_end(btn, False, False, 20)
         
-        app["widget"] = card
+        row.add(card)
+        app["row"] = row
         app["visible"] = True
-        self.flow.add(card)
+        self.listbox.add(row)
         self.cards.append(app)
 
     def filter_apps(self, term, category):
@@ -173,10 +179,10 @@ class AppStore(Gtk.Window):
                 match = False
             
             if match and not app["visible"]:
-                app["widget"].show()
+                app["row"].show()
                 app["visible"] = True
             elif not match and app["visible"]:
-                app["widget"].hide()
+                app["row"].hide()
                 app["visible"] = False
 
     def on_search(self, search_entry):
@@ -189,27 +195,29 @@ class AppStore(Gtk.Window):
         self.filter_apps(self.search.get_text().lower(), cat)
 
     def on_install(self, btn, app):
-        btn.set_sensitive(False); btn.set_label("CONNECTING..."); btn.set_name("install-btn")
+        btn.set_sensitive(False); btn.set_label("LOCATING..."); btn.set_name("install-btn")
         app["pbar"].set_visible(True)
         threading.Thread(target=self.download_app, args=(app,), daemon=True).start()
 
     def download_app(self, app):
         try:
-            # Bypass GitHub API Limits by scraping HTML for exact direct download URL!
-            repo_url = f"https://github.com/{app['repo']}/releases/latest"
-            req = urllib.request.Request(repo_url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0)'})
-            GLib.idle_add(app["btn"].set_label, "FETCHING...")
+            # 1. Fetch latest release page to get redirected to the actual Tag URL (Bypassing API limits!)
+            latest_url = f"https://github.com/{app['repo']}/releases/latest"
+            req = urllib.request.Request(latest_url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'})
+            resp = urllib.request.urlopen(req)
+            tag = resp.url.split('/')[-1]
             
-            try:
-                html = urllib.request.urlopen(req).read().decode('utf-8')
-                dl_url = None
-                for line in html.split('"'):
-                    if line.endswith('.AppImage') and '/releases/download/' in line:
-                        dl_url = "https://github.com" + line
-                        break
-            except:
-                dl_url = None
-                
+            # 2. Fetch the expanded assets HTML
+            assets_url = f"https://github.com/{app['repo']}/releases/expanded_assets/{tag}"
+            req2 = urllib.request.Request(assets_url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'})
+            html = urllib.request.urlopen(req2).read().decode('utf-8')
+            
+            dl_url = None
+            for chunk in html.split('"'):
+                if chunk.endswith('.AppImage') and '/releases/download/' in chunk:
+                    dl_url = "https://github.com" + chunk
+                    break
+                    
             if not dl_url:
                 GLib.idle_add(self.fail, app, "App Download Missing (404)")
                 return
@@ -227,7 +235,7 @@ class AppStore(Gtk.Window):
             os.chmod(out_path, 0o755)
             
             # Desktop File Magic
-            d_cont = f"[Desktop Entry]\nName={app['name']}\nComment={app['desc']}\nExec=\"{out_path}\"\nIcon={app['icon']}\nTerminal=false\nType=Application\nCategories={app['cat']};Utility;\n"
+            d_cont = f"[Desktop Entry]\nName={app['name']}\nComment={app['desc']}\nExec=\"{out_path}\"\nTerminal=false\nType=Application\nCategories={app['cat']};Utility;\n"
             dfile = os.path.join(self.shortcut_dir, f"ethereal_{app['id']}.desktop")
             with open(dfile, 'w') as f: f.write(d_cont)
             os.chmod(dfile, 0o755)
@@ -245,6 +253,7 @@ class AppStore(Gtk.Window):
         app["pbar"].set_visible(False)
         app["btn"].set_label("FAILED")
         app["btn"].set_sensitive(True)
+        print(f"[{app['name']}] Install Failed:", msg)
 
 if __name__ == "__main__":
     try:
