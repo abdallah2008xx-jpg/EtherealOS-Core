@@ -15,7 +15,7 @@ window { background-color: transparent; }
 }
 
 .header { padding: 40px; }
-.title { color: #7ed7ff; font-size: 28px; font-weight: 900; letter-spacing: 1px; }
+.title { color: #7ed7ff; font-size: 28px; font-weight: 900; }
 .subtitle { color: #718096; font-size: 14px; margin-top: 5px; }
 
 .step-card {
@@ -33,7 +33,7 @@ window { background-color: transparent; }
 .step-card.done { opacity: 0.6; }
 
 .step-name { color: #f7fafc; font-size: 16px; font-weight: 700; }
-.step-status { color: #7ed7ff; font-size: 12px; font-weight: 600; text-transform: uppercase; }
+.step-status { color: #7ed7ff; font-size: 12px; font-weight: 600; }
 
 .progress-container { padding: 30px 40px; }
 progressbar trough { background-color: rgba(0,0,0, 0.4); border-radius: 12px; min-height: 10px; }
@@ -57,7 +57,7 @@ textview text { background-color: transparent; color: #a0aec0; font-family: 'Mon
     border-radius: 16px; padding: 15px 40px; border: none;
     font-size: 16px; transition: all 0.3s;
 }
-.start-btn:hover { transform: scale(1.02); box-shadow: 0 0 30px rgba(79, 172, 254, 0.4); }
+.start-btn:hover { box-shadow: 0 0 30px rgba(79, 172, 254, 0.4); }
 .start-btn:disabled { background: rgba(255,255,255,0.1); color: #4a5568; }
 """
 
