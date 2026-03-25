@@ -196,7 +196,7 @@ if command -v flatpak >/dev/null 2>&1; then
     flatpak install --noninteractive flathub org.onlyoffice.desktopeditors 2>/dev/null || true
 fi
 
-# D. Dynamic Swap Management (Swapspace)
+echo "15. Dynamic Swap Management (Swapspace)..."
 if ! command -v swapspace >/dev/null 2>&1; then
     echo "   → Installing Dynamic Swap Manager (Swapspace)..."
     sudo emerge --ask=n --quiet sys-apps/swapspace 2>/dev/null || true
