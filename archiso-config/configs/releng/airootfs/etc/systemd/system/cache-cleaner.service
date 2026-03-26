@@ -1,0 +1,11 @@
+[Unit]
+Description=Auto Clear RAM Cache when full
+After=multi-user.target
+
+[Service]
+ExecStart=/bin/bash /usr/local/bin/clear_cache.sh
+Restart=always
+User=root
+
+[Install]
+WantedBy=multi-user.target

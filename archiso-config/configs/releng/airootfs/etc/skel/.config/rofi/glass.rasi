@@ -1,0 +1,80 @@
+* {
+    /* الخطوط العصرية المتوافقة مع الـ High DPI */
+    font: "JetBrainsMono Nerd Font 13";
+    background-color: transparent;
+    text-color: #ffffff;
+    
+    /* خلفية زجاجية شفافة بنسبة 40% (Dark Glass) */
+    bg-glass: rgba(15, 15, 15, 0.4);
+    
+    /* توهج أزرق متدرج عند اختيار التطبيق */
+    bg-glow: rgba(0, 242, 254, 0.35); 
+    border-glow: rgba(0, 242, 254, 0.7);
+}
+
+window {
+    background-color: @bg-glass;
+    border: 2px solid;
+    border-color: @border-glow;
+    border-radius: 15px; /* حواف منحنية 15 بكسل */
+    width: 600px; /* العرض المناسب لتناسق الشاشة */
+    padding: 24px;
+}
+
+mainbox {
+    background-color: transparent;
+    children: [ inputbar, listview ];
+    spacing: 20px;
+}
+
+inputbar {
+    background-color: rgba(255, 255, 255, 0.05); /* إدخال البحث بارز بنسبة ضئيلة الشفافية */
+    border-radius: 12px;
+    padding: 14px;
+    children: [ prompt, entry ];
+}
+
+prompt {
+    background-color: transparent;
+    text-color: rgba(79, 172, 254, 1.0);
+    margin: 0px 12px 0px 0px;
+    font: "JetBrainsMono Nerd Font Bold 13";
+}
+
+entry {
+    background-color: transparent;
+    text-color: #ffffff;
+    placeholder: "🔍 Search applications...";
+    placeholder-color: rgba(255, 255, 255, 0.4);
+}
+
+listview {
+    background-color: transparent;
+    columns: 2; /* عرض التطبيقات في عمودين */
+    lines: 6; /* عدد الأسطر */
+    spacing: 12px;
+    scrollbar: false;
+}
+
+element {
+    background-color: transparent;
+    padding: 12px;
+    border-radius: 12px;
+}
+
+element selected {
+    background-color: @bg-glow;
+    border: 1px solid @border-glow;
+    text-color: #ffffff;
+}
+
+element-icon {
+    background-color: transparent;
+    size: 28px; /* أيقونات واضحة وحادة (يصلح لـ 4K) */
+    margin: 0px 14px 0px 0px;
+}
+
+element-text {
+    background-color: transparent;
+    vertical-align: 0.5;
+}

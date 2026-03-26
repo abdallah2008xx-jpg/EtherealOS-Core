@@ -1,0 +1,13 @@
+
+ [1;34m=== Stunning OS — Recovery Shell === [0m
+
+ [1;33mفي حال فشل الإقلاع الرسومي (الشاشة السوداء): [0m
+١. تحقق من ملف السجل:  [32m/tmp/hyprland-sw.log [0m
+٢. حاول تشغيل الواجهة يدوياً:  [32m/usr/local/bin/hyprland-sw.sh [0m
+٣. للتغيير لنمط VESA الآمن:  [32mRENDER_MODE=software /usr/local/bin/hyprland-sw.sh [0m
+
+ [1;36mالتواصل والدعم: [0m  [35m0798311071 [0m |  [35mnasty2009vv@gmail.com [0m
+
+Arch Linux install medium provided by  [1;34mStunning OS [0m
+ [0;37m-------------------------------------------------------- [0m
+ [0m

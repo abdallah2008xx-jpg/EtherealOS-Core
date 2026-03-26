@@ -1,0 +1,55 @@
+* {
+    font-family: "Inter", "JetBrainsMono Nerd Font", "Roboto", sans-serif;
+    font-size: 14px;
+    border: none;
+    border-radius: 0;
+}
+
+window#waybar {
+    background-color: rgba(15, 15, 15, 0.75);
+    border-bottom: 2px solid rgba(0, 242, 254, 0.5);
+    color: #ffffff;
+    transition-property: background-color;
+    transition-duration: .5s;
+}
+
+#workspaces button {
+    padding: 0 5px;
+    background-color: transparent;
+    color: #ffffff;
+    border-bottom: 3px solid transparent;
+}
+
+#workspaces button.active {
+    background-color: rgba(79, 172, 254, 0.3);
+    border-bottom: 3px solid #00f2fe;
+}
+
+#workspaces button:hover {
+    background: rgba(0, 0, 0, 0.2);
+    box-shadow: inherit;
+    text-shadow: inherit;
+}
+
+#clock,
+#cpu,
+#memory,
+#window,
+#tray {
+    padding: 0 10px;
+    margin: 4px 0;
+    color: #ffffff;
+}
+
+#clock {
+    font-weight: bold;
+    color: #4facfe;
+}
+
+#cpu {
+    color: #00f2fe;
+}
+
+#memory {
+    color: #4facfe;
+}

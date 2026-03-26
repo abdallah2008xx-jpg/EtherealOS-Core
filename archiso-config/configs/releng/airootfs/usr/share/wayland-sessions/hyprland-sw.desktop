@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Stunning OS (Hyprland Auto-Detect)
+Comment=An intelligent dynamic tiling Wayland compositor with auto-GPU detection
+Exec=/usr/local/bin/hyprland-sw.sh
+Type=Application
+Icon=hyprland
+Categories=System;WM;Wayland;
+Keywords=tiling;wayland;compositor;

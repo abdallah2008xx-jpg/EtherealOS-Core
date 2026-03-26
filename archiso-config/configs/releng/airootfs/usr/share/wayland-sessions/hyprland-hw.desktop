@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Stunning OS (Hardware Forced)
+Comment=An intelligent dynamic tiling Wayland compositor with hardware acceleration
+Exec=/usr/local/bin/hyprland-hw.sh
+Type=Application
+Icon=hyprland
+Categories=System;WM;Wayland;
+Keywords=tiling;wayland;compositor;
